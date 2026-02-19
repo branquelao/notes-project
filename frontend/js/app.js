@@ -2,69 +2,110 @@
 const API_URL = 'https://localhost:7269/api/Notes';
 
 // Elements
+const sidebarNotesList = document.getElementById('sidebarNotesList');
+const editorPlaceholder = document.getElementById('editorPlaceholder');
+const editorContent = document.getElementById('editorContent');
 const noteTitle = document.getElementById('noteTitle');
 const noteContent = document.getElementById('noteContent');
-const saveBtn = document.getElementById('saveBtn');
-const notesList = document.getElementById('notesList');
+const newNoteBtn = document.getElementById('newNoteBtn');
+
+// State
+let notes = [];
+let currentNoteId = null;
+let saveTimeout = null;
 
 // Load notes when page loads
 document.addEventListener('DOMContentLoaded', loadNotes);
 
-// Save button click
-saveBtn.addEventListener('click', saveNote);
+// New note button
+newNoteBtn.addEventListener('click', createNewNote);
+
+// Auto-save on input (debounced)
+noteTitle.addEventListener('input', () => autoSave());
+noteContent.addEventListener('input', () => autoSave());
 
 // Load all notes from API
 async function loadNotes() {
     try {
         const response = await fetch(API_URL);
-        const notes = await response.json();
+        notes = await response.json();
         
-        displayNotes(notes);
+        renderSidebar();
+        
+        // If there are notes, select the first one
+        if (notes.length > 0 && currentNoteId === null) {
+            selectNote(notes[0].id);
+        }
     } catch (error) {
         console.error('Error loading notes:', error);
-        notesList.innerHTML = '<p>Error loading notes. Make sure the API is running.</p>';
+        sidebarNotesList.innerHTML = '<p style="padding: 12px; color: #9b9a97;">Error loading notes</p>';
     }
 }
 
-// Display notes on page
-function displayNotes(notes) {
+// Render sidebar notes list
+function renderSidebar() {
     if (notes.length === 0) {
-        notesList.innerHTML = '<p>No notes yet. Create your first note!</p>';
+        sidebarNotesList.innerHTML = '<p style="padding: 12px; color: #9b9a97; font-size: 0.85rem;">No notes yet</p>';
         return;
     }
 
-    notesList.innerHTML = '';
+    sidebarNotesList.innerHTML = '';
     
     notes.forEach(note => {
-        const noteCard = document.createElement('div');
-        noteCard.className = 'note-card';
-        noteCard.innerHTML = `
-            <h3>${escapeHtml(note.title)}</h3>
-            <p>${escapeHtml(note.content)}</p>
-            <div class="note-date">${formatDate(note.createdAt)}</div>
-            <div class="note-actions">
-                <button class="edit-btn" onclick="editNote(${note.id})">Edit</button>
-                <button class="delete-btn" onclick="deleteNote(${note.id})">Delete</button>
-            </div>
+        const noteItem = document.createElement('div');
+        noteItem.className = 'note-item';
+        if (note.id === currentNoteId) {
+            noteItem.classList.add('active');
+        }
+        
+        noteItem.innerHTML = `
+            <div class="note-item-title">${escapeHtml(note.title) || 'Untitled'}</div>
+            <button class="note-item-delete" onclick="deleteNote(${note.id}, event)">×</button>
         `;
         
-        notesList.appendChild(noteCard);
+        noteItem.addEventListener('click', () => selectNote(note.id));
+        
+        sidebarNotesList.appendChild(noteItem);
     });
 }
 
-// Save new note
-async function saveNote() {
-    const title = noteTitle.value.trim();
-    const content = noteContent.value.trim();
-    
-    if (!title || !content) {
-        alert('Please fill in both title and content');
-        return;
+// Select and display a note
+async function selectNote(id) {
+    // Save current note before switching
+    if (currentNoteId !== null && currentNoteId !== id) {
+        await saveCurrentNote();
     }
     
-    const note = {
-        title: title,
-        content: content
+    currentNoteId = id;
+    const note = notes.find(n => n.id === id);
+    
+    if (!note) return;
+    
+    // Show editor, hide placeholder
+    editorPlaceholder.style.display = 'none';
+    editorContent.style.display = 'flex';
+    
+    // Populate editor
+    noteTitle.value = note.title;
+    noteContent.value = note.content;
+    
+    // Update sidebar active state
+    renderSidebar();
+    
+    // Focus on content
+    noteContent.focus();
+}
+
+// Create new note
+async function createNewNote() {
+    // Save current note first
+    if (currentNoteId !== null) {
+        await saveCurrentNote();
+    }
+    
+    const newNote = {
+        title: 'Untitled',
+        content: ''
     };
     
     try {
@@ -73,24 +114,79 @@ async function saveNote() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(note)
+            body: JSON.stringify(newNote)
         });
         
         if (response.ok) {
-            noteTitle.value = '';
-            noteContent.value = '';
-            loadNotes();
-        } else {
-            alert('Error saving note');
+            const createdNote = await response.json();
+            notes.unshift(createdNote); // Add to beginning
+            selectNote(createdNote.id);
+            renderSidebar();
+            
+            // Focus and select title for easy renaming
+            noteTitle.focus();
+            noteTitle.select();
+        }
+    } catch (error) {
+        console.error('Error creating note:', error);
+        alert('Error creating note. Make sure the API is running.');
+    }
+}
+
+// Auto-save with debounce
+function autoSave() {
+    if (currentNoteId === null) return;
+    
+    // Clear previous timeout
+    if (saveTimeout) {
+        clearTimeout(saveTimeout);
+    }
+    
+    // Set new timeout (save after 1 second of no typing)
+    saveTimeout = setTimeout(() => {
+        saveCurrentNote();
+    }, 1000);
+}
+
+// Save current note
+async function saveCurrentNote() {
+    if (currentNoteId === null) return;
+    
+    const note = notes.find(n => n.id === currentNoteId);
+    if (!note) return;
+    
+    const updatedNote = {
+        id: currentNoteId,
+        title: noteTitle.value.trim() || 'Untitled',
+        content: noteContent.value
+    };
+    
+    try {
+        const response = await fetch(`${API_URL}/${currentNoteId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedNote)
+        });
+        
+        if (response.ok) {
+            // Update local notes array
+            const index = notes.findIndex(n => n.id === currentNoteId);
+            if (index !== -1) {
+                notes[index] = { ...notes[index], ...updatedNote };
+                renderSidebar();
+            }
         }
     } catch (error) {
         console.error('Error saving note:', error);
-        alert('Error saving note. Make sure the API is running.');
     }
 }
 
 // Delete note
-async function deleteNote(id) {
+async function deleteNote(id, event) {
+    event.stopPropagation(); // Prevent note selection
+    
     if (!confirm('Are you sure you want to delete this note?')) {
         return;
     }
@@ -101,9 +197,24 @@ async function deleteNote(id) {
         });
         
         if (response.ok) {
-            loadNotes();
-        } else {
-            alert('Error deleting note');
+            // Remove from notes array
+            notes = notes.filter(n => n.id !== id);
+            
+            // If deleted note was selected, clear editor
+            if (currentNoteId === id) {
+                currentNoteId = null;
+                editorPlaceholder.style.display = 'flex';
+                editorContent.style.display = 'none';
+                noteTitle.value = '';
+                noteContent.value = '';
+                
+                // Select first note if available
+                if (notes.length > 0) {
+                    selectNote(notes[0].id);
+                }
+            }
+            
+            renderSidebar();
         }
     } catch (error) {
         console.error('Error deleting note:', error);
@@ -111,55 +222,16 @@ async function deleteNote(id) {
     }
 }
 
-// Edit note (simplified version - you can improve this)
-async function editNote(id) {
-    const newTitle = prompt('Enter new title:');
-    const newContent = prompt('Enter new content:');
-    
-    if (!newTitle || !newContent) {
-        return;
-    }
-    
-    const note = {
-        id: id,
-        title: newTitle,
-        content: newContent
-    };
-    
-    try {
-        const response = await fetch(`${API_URL}/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(note)
-        });
-        
-        if (response.ok) {
-            loadNotes();
-        } else {
-            alert('Error updating note');
-        }
-    } catch (error) {
-        console.error('Error updating note:', error);
-        alert('Error updating note. Make sure the API is running.');
-    }
-}
-
-// Utility functions
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
-
+// Utility function
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
+
+// Save on page unload
+window.addEventListener('beforeunload', () => {
+    if (currentNoteId !== null) {
+        saveCurrentNote();
+    }
+});
