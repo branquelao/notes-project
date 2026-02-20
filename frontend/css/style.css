@@ -130,19 +130,63 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 60px 96px;
     overflow-y: auto;
 }
 
+/* Toolbar */
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 96px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fafafa;
+    flex-shrink: 0;
+}
+
+.toolbar-btn {
+    background: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.15s;
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toolbar-btn:hover {
+    background: #f0f0f0;
+    border-color: #b0b0b0;
+}
+
+.toolbar-btn:active,
+.toolbar-btn.active {
+    background: #e0e0e0;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 24px;
+    background: #d0d0d0;
+    margin: 0 4px;
+}
+
+/* Editor Inputs */
 .note-title-input {
     border: none;
     outline: none;
     font-size: 2.5rem;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin: 20px 96px 10px 96px;
     color: #37352f;
     background: transparent;
     padding: 0;
+    flex-shrink: 0;
 }
 
 .note-title-input::placeholder {
@@ -156,34 +200,73 @@ body {
     line-height: 1.6;
     color: #37352f;
     background: transparent;
-    resize: none;
     flex: 1;
-    font-family: inherit;
-    padding: 0;
+    padding: 0 96px 60px 96px;
+    overflow-y: auto;
+    min-height: 200px;
 }
 
-.note-content-input::placeholder {
+.note-content-input:empty:before {
+    content: attr(data-placeholder);
     color: #c0bfbc;
+    pointer-events: none;
+}
+
+.note-content-input:focus {
+    outline: none;
+}
+
+/* Formatting styles inside editor */
+.note-content-input strong,
+.note-content-input b {
+    font-weight: 700;
+}
+
+.note-content-input em,
+.note-content-input i {
+    font-style: italic;
+}
+
+.note-content-input u {
+    text-decoration: underline;
+}
+
+.note-content-input s {
+    text-decoration: line-through;
+}
+
+.note-content-input ul,
+.note-content-input ol {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.note-content-input li {
+    margin-bottom: 5px;
 }
 
 /* Scrollbar Styling */
 .notes-list::-webkit-scrollbar,
-.editor-content::-webkit-scrollbar {
+.editor-content::-webkit-scrollbar,
+.note-content-input::-webkit-scrollbar {
     width: 8px;
 }
 
 .notes-list::-webkit-scrollbar-track,
-.editor-content::-webkit-scrollbar-track {
+.editor-content::-webkit-scrollbar-track,
+.note-content-input::-webkit-scrollbar-track {
     background: transparent;
 }
 
 .notes-list::-webkit-scrollbar-thumb,
-.editor-content::-webkit-scrollbar-thumb {
+.editor-content::-webkit-scrollbar-thumb,
+.note-content-input::-webkit-scrollbar-thumb {
     background: #d0d0d0;
     border-radius: 4px;
 }
 
 .notes-list::-webkit-scrollbar-thumb:hover,
-.editor-content::-webkit-scrollbar-thumb:hover {
+.editor-content::-webkit-scrollbar-thumb:hover,
+.note-content-input::-webkit-scrollbar-thumb:hover {
     background: #b0b0b0;
 }
