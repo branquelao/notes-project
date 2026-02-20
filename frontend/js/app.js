@@ -8,6 +8,7 @@ const editorContent = document.getElementById('editorContent');
 const noteTitle = document.getElementById('noteTitle');
 const noteContent = document.getElementById('noteContent');
 const newNoteBtn = document.getElementById('newNoteBtn');
+const toolbarBtns = document.querySelectorAll('.toolbar-btn');
 
 // State
 let notes = [];
@@ -23,6 +24,52 @@ newNoteBtn.addEventListener('click', createNewNote);
 // Auto-save on input (debounced)
 noteTitle.addEventListener('input', () => autoSave());
 noteContent.addEventListener('input', () => autoSave());
+
+// Toolbar buttons
+toolbarBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const command = btn.getAttribute('data-command');
+        executeCommand(command);
+    });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    // Only work when editor is visible
+    if (editorContent.style.display === 'none') return;
+    
+    if (e.ctrlKey || e.metaKey) {
+        switch(e.key.toLowerCase()) {
+            case 'b':
+                e.preventDefault();
+                executeCommand('bold');
+                break;
+            case 'i':
+                e.preventDefault();
+                executeCommand('italic');
+                break;
+            case 'u':
+                e.preventDefault();
+                executeCommand('underline');
+                break;
+            case 'n':
+                e.preventDefault();
+                createNewNote();
+                break;
+            case 's':
+                e.preventDefault();
+                saveCurrentNote();
+                break;
+        }
+    }
+});
+
+// Execute formatting command
+function executeCommand(command) {
+    document.execCommand(command, false, null);
+    noteContent.focus();
+}
 
 // Load all notes from API
 async function loadNotes() {
@@ -58,8 +105,11 @@ function renderSidebar() {
             noteItem.classList.add('active');
         }
         
+        // Get plain text from HTML for sidebar display
+        const plainTitle = stripHtml(note.title) || 'Untitled';
+        
         noteItem.innerHTML = `
-            <div class="note-item-title">${escapeHtml(note.title) || 'Untitled'}</div>
+            <div class="note-item-title">${escapeHtml(plainTitle)}</div>
             <button class="note-item-delete" onclick="deleteNote(${note.id}, event)">×</button>
         `;
         
@@ -85,9 +135,9 @@ async function selectNote(id) {
     editorPlaceholder.style.display = 'none';
     editorContent.style.display = 'flex';
     
-    // Populate editor
-    noteTitle.value = note.title;
-    noteContent.value = note.content;
+    // Populate editor (support HTML content)
+    noteTitle.value = stripHtml(note.title);
+    noteContent.innerHTML = note.content;
     
     // Update sidebar active state
     renderSidebar();
@@ -158,7 +208,7 @@ async function saveCurrentNote() {
     const updatedNote = {
         id: currentNoteId,
         title: noteTitle.value.trim() || 'Untitled',
-        content: noteContent.value
+        content: noteContent.innerHTML // Save as HTML
     };
     
     try {
@@ -206,7 +256,7 @@ async function deleteNote(id, event) {
                 editorPlaceholder.style.display = 'flex';
                 editorContent.style.display = 'none';
                 noteTitle.value = '';
-                noteContent.value = '';
+                noteContent.innerHTML = '';
                 
                 // Select first note if available
                 if (notes.length > 0) {
@@ -222,11 +272,17 @@ async function deleteNote(id, event) {
     }
 }
 
-// Utility function
+// Utility functions
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+function stripHtml(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
 }
 
 // Save on page unload
