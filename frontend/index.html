@@ -27,6 +27,71 @@
             </div>
 
             <div class="editor-content" id="editorContent" style="display: none;">
+                <!-- Top Bar with Menu -->
+                <div class="editor-top-bar">
+                    <div class="editor-top-bar-left"></div>
+                    <div class="editor-top-bar-right">
+                        <button class="menu-btn" id="menuBtn">⋯</button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <div class="dropdown-section">
+                                <div class="dropdown-item font-option" data-font="default">
+                                    <span class="font-preview" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;">Ag</span>
+                                    <span>Default</span>
+                                </div>
+                                <div class="dropdown-item font-option" data-font="serif">
+                                    <span class="font-preview" style="font-family: 'Georgia', serif;">Ag</span>
+                                    <span>Serif</span>
+                                </div>
+                                <div class="dropdown-item font-option" data-font="mono">
+                                    <span class="font-preview" style="font-family: 'Courier New', monospace;">Ag</span>
+                                    <span>Mono</span>
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown-divider"></div>
+                            
+                            <div class="dropdown-section">
+                                <div class="dropdown-item">
+                                    <span>Small text</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="smallTextToggle">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="dropdown-item">
+                                    <span>Full width</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="fullWidthToggle">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown-divider"></div>
+                            
+                            <div class="dropdown-section">
+                                <div class="dropdown-item" id="deleteNoteOption">
+                                    <span>🗑️ Delete note</span>
+                                </div>
+                                <div class="dropdown-item" id="duplicateNoteOption">
+                                    <span>📄 Duplicate</span>
+                                    <span class="shortcut">Ctrl+D</span>
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown-divider"></div>
+                            
+                            <div class="dropdown-section">
+                                <div class="dropdown-item" id="exportNoteOption">
+                                    <span>⬇️ Export</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Formatting Toolbar -->
                 <div class="toolbar">
                     <button class="toolbar-btn" data-command="bold" title="Bold (Ctrl+B)">
