@@ -9,11 +9,22 @@ const noteTitle = document.getElementById('noteTitle');
 const noteContent = document.getElementById('noteContent');
 const newNoteBtn = document.getElementById('newNoteBtn');
 const toolbarBtns = document.querySelectorAll('.toolbar-btn');
+const menuBtn = document.getElementById('menuBtn');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const fontOptions = document.querySelectorAll('.font-option');
+const smallTextToggle = document.getElementById('smallTextToggle');
+const fullWidthToggle = document.getElementById('fullWidthToggle');
+const deleteNoteOption = document.getElementById('deleteNoteOption');
+const duplicateNoteOption = document.getElementById('duplicateNoteOption');
+const exportNoteOption = document.getElementById('exportNoteOption');
 
 // State
 let notes = [];
 let currentNoteId = null;
 let saveTimeout = null;
+let currentFont = 'default';
+let isSmallText = false;
+let isFullWidth = false;
 
 // Load notes when page loads
 document.addEventListener('DOMContentLoaded', loadNotes);
@@ -32,6 +43,63 @@ toolbarBtns.forEach(btn => {
         const command = btn.getAttribute('data-command');
         executeCommand(command);
     });
+});
+
+// Menu button toggle
+menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdownMenu.classList.toggle('active');
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!dropdownMenu.contains(e.target) && e.target !== menuBtn) {
+        dropdownMenu.classList.remove('active');
+    }
+});
+
+// Font options
+fontOptions.forEach(option => {
+    option.addEventListener('click', () => {
+        const font = option.getAttribute('data-font');
+        setFont(font);
+    });
+});
+
+// Small text toggle
+smallTextToggle.addEventListener('change', () => {
+    isSmallText = smallTextToggle.checked;
+    applyTextSize();
+});
+
+// Full width toggle
+fullWidthToggle.addEventListener('change', () => {
+    isFullWidth = fullWidthToggle.checked;
+    applyWidth();
+});
+
+// Delete note option
+deleteNoteOption.addEventListener('click', () => {
+    if (currentNoteId) {
+        dropdownMenu.classList.remove('active');
+        deleteNote(currentNoteId, { stopPropagation: () => {} });
+    }
+});
+
+// Duplicate note option
+duplicateNoteOption.addEventListener('click', () => {
+    if (currentNoteId) {
+        dropdownMenu.classList.remove('active');
+        duplicateNote();
+    }
+});
+
+// Export note option
+exportNoteOption.addEventListener('click', () => {
+    if (currentNoteId) {
+        dropdownMenu.classList.remove('active');
+        exportNote();
+    }
 });
 
 // Keyboard shortcuts
@@ -61,6 +129,10 @@ document.addEventListener('keydown', (e) => {
                 e.preventDefault();
                 saveCurrentNote();
                 break;
+            case 'd':
+                e.preventDefault();
+                duplicateNote();
+                break;
         }
     }
 });
@@ -69,6 +141,54 @@ document.addEventListener('keydown', (e) => {
 function executeCommand(command) {
     document.execCommand(command, false, null);
     noteContent.focus();
+}
+
+// Set font
+function setFont(font) {
+    currentFont = font;
+    
+    // Remove active class from all options
+    fontOptions.forEach(opt => opt.classList.remove('active'));
+    
+    // Add active class to selected option
+    const selectedOption = document.querySelector(`[data-font="${font}"]`);
+    if (selectedOption) {
+        selectedOption.classList.add('active');
+    }
+    
+    // Apply font to both title and content
+    noteTitle.classList.remove('font-default', 'font-serif', 'font-mono');
+    noteContent.classList.remove('font-default', 'font-serif', 'font-mono');
+    noteTitle.classList.add(`font-${font}`);
+    noteContent.classList.add(`font-${font}`);
+}
+
+// Apply text size
+function applyTextSize() {
+    if (isSmallText) {
+        noteContent.classList.add('small-text');
+    } else {
+        noteContent.classList.remove('small-text');
+    }
+}
+
+// Apply width
+function applyWidth() {
+    const toolbar = document.querySelector('.toolbar');
+    const topBar = document.querySelector('.editor-top-bar');
+    const titleInput = document.querySelector('.note-title-input');
+    
+    if (isFullWidth) {
+        toolbar.style.padding = '12px 48px';
+        topBar.style.padding = '12px 48px';
+        titleInput.style.margin = '20px 48px 10px 48px';
+        noteContent.style.padding = '0 48px 60px 48px';
+    } else {
+        toolbar.style.padding = '12px 96px';
+        topBar.style.padding = '12px 96px';
+        titleInput.style.margin = '20px 96px 10px 96px';
+        noteContent.style.padding = '0 96px 60px 96px';
+    }
 }
 
 // Load all notes from API
@@ -181,6 +301,62 @@ async function createNewNote() {
         console.error('Error creating note:', error);
         alert('Error creating note. Make sure the API is running.');
     }
+}
+
+// Duplicate note
+async function duplicateNote() {
+    if (currentNoteId === null) return;
+    
+    const note = notes.find(n => n.id === currentNoteId);
+    if (!note) return;
+    
+    const duplicatedNote = {
+        title: stripHtml(note.title) + ' (Copy)',
+        content: note.content
+    };
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(duplicatedNote)
+        });
+        
+        if (response.ok) {
+            const createdNote = await response.json();
+            notes.unshift(createdNote);
+            selectNote(createdNote.id);
+            renderSidebar();
+        }
+    } catch (error) {
+        console.error('Error duplicating note:', error);
+        alert('Error duplicating note.');
+    }
+}
+
+// Export note as text file
+function exportNote() {
+    if (currentNoteId === null) return;
+    
+    const note = notes.find(n => n.id === currentNoteId);
+    if (!note) return;
+    
+    const title = stripHtml(note.title) || 'Untitled';
+    const content = stripHtml(note.content);
+    const fullContent = `${title}\n\n${content}`;
+    
+    // Create blob and download
+    const blob = new Blob([fullContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 // Auto-save with debounce
