@@ -18,6 +18,7 @@ const deleteNoteOption = document.getElementById('deleteNoteOption');
 const duplicateNoteOption = document.getElementById('duplicateNoteOption');
 const exportNoteOption = document.getElementById('exportNoteOption');
 const searchInput = document.getElementById('searchInput');
+const darkModeToggle = document.getElementById('darkModeToggle');
 
 // State
 let notes = [];
@@ -29,7 +30,10 @@ let isFullWidth = false;
 let searchQuery = '';
 
 // Load notes when page loads
-document.addEventListener('DOMContentLoaded', loadNotes);
+document.addEventListener('DOMContentLoaded', () => {
+    loadDarkModePreference();
+    loadNotes();
+});
 
 // New note button
 newNoteBtn.addEventListener('click', createNewNote);
@@ -78,6 +82,11 @@ smallTextToggle.addEventListener('change', () => {
 fullWidthToggle.addEventListener('change', () => {
     isFullWidth = fullWidthToggle.checked;
     applyWidth();
+});
+
+// Dark mode toggle
+darkModeToggle.addEventListener('change', () => {
+    toggleDarkMode();
 });
 
 // Delete note option
@@ -458,6 +467,25 @@ async function deleteNote(id, event) {
     } catch (error) {
         console.error('Error deleting note:', error);
         alert('Error deleting note. Make sure the API is running.');
+    }
+}
+
+// Toggle dark mode
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    
+    // Save preference to localStorage
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', isDarkMode);
+}
+
+// Load dark mode preference on page load
+function loadDarkModePreference() {
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.checked = true;
     }
 }
 
