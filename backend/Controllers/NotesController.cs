@@ -94,6 +94,25 @@ namespace NotesProjectAPI.Controllers
             return NoContent();
         }
 
+        // PATCH: api/Notes/5/favorite
+        [HttpPatch("{id}/favorite")]
+        public async Task<IActionResult> ToggleFavorite(int id)
+        {
+            var note = await _context.Notes.FindAsync(id);
+
+            if (note == null)
+            {
+                return NotFound();
+            }
+
+            note.IsFavorite = !note.IsFavorite;
+            note.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(note);
+        }
+
         private bool NoteExists(int id)
         {
             return _context.Notes.Any(e => e.Id == id);

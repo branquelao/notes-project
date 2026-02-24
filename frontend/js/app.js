@@ -208,9 +208,15 @@ async function loadNotes() {
         const response = await fetch(API_URL);
         notes = await response.json();
         
+        // Sort: favorites first, then by UpdatedAt (most recent first)
+        notes.sort((a, b) => {
+            if (a.isFavorite && !b.isFavorite) return -1;
+            if (!a.isFavorite && b.isFavorite) return 1;
+            return new Date(b.updatedAt) - new Date(a.updatedAt);
+        });
+        
         renderSidebar();
         
-        // If there are notes, select the first one
         if (notes.length > 0 && currentNoteId === null) {
             selectNote(notes[0].id);
         }
@@ -249,10 +255,17 @@ function renderSidebar() {
         
         // Get plain text from HTML for sidebar display
         const plainTitle = stripHtml(note.title) || 'Untitled';
-        
+
         noteItem.innerHTML = `
-            <div class="note-item-title">${escapeHtml(plainTitle)}</div>
-            <button class="note-item-delete" onclick="deleteNote(${note.id}, event)">×</button>
+            <div class="note-item-content">
+                <div class="note-item-title">${escapeHtml(plainTitle)}</div>
+            </div>
+            <div class="note-item-actions">
+                <button class="note-item-favorite ${note.isFavorite ? 'active' : ''}" onclick="toggleFavorite(${note.id}, event)">
+                    ${note.isFavorite ? '⭐' : '☆'}
+                </button>
+                <button class="note-item-delete" onclick="deleteNote(${note.id}, event)">×</button>
+            </div>
         `;
         
         noteItem.addEventListener('click', () => selectNote(note.id));
@@ -431,6 +444,39 @@ async function saveCurrentNote() {
     }
 }
 
+// Toggle favorite status
+async function toggleFavorite(id, event) {
+    event.stopPropagation(); // Prevent note selection
+    
+    try {
+        const response = await fetch(`${API_URL}/${id}/favorite`, {
+            method: 'PATCH'
+        });
+        
+        if (response.ok) {
+            const updatedNote = await response.json();
+            
+            // Update local notes array
+            const index = notes.findIndex(n => n.id === id);
+            if (index !== -1) {
+                notes[index] = updatedNote;
+                
+                // Re-sort: favorites first, then by UpdatedAt
+                notes.sort((a, b) => {
+                    if (a.isFavorite && !b.isFavorite) return -1;
+                    if (!a.isFavorite && b.isFavorite) return 1;
+                    return new Date(b.updatedAt) - new Date(a.updatedAt);
+                });
+                
+                renderSidebar();
+            }
+        }
+    } catch (error) {
+        console.error('Error toggling favorite:', error);
+        alert('Error updating favorite status.');
+    }
+}
+
 // Delete note
 async function deleteNote(id, event) {
     event.stopPropagation(); // Prevent note selection
@@ -487,6 +533,13 @@ function loadDarkModePreference() {
         document.body.classList.add('dark-mode');
         darkModeToggle.checked = true;
     }
+}
+
+// Utility functions
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // Utility functions
