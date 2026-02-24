@@ -17,6 +17,7 @@ const fullWidthToggle = document.getElementById('fullWidthToggle');
 const deleteNoteOption = document.getElementById('deleteNoteOption');
 const duplicateNoteOption = document.getElementById('duplicateNoteOption');
 const exportNoteOption = document.getElementById('exportNoteOption');
+const searchInput = document.getElementById('searchInput');
 
 // State
 let notes = [];
@@ -25,6 +26,7 @@ let saveTimeout = null;
 let currentFont = 'default';
 let isSmallText = false;
 let isFullWidth = false;
+let searchQuery = '';
 
 // Load notes when page loads
 document.addEventListener('DOMContentLoaded', loadNotes);
@@ -211,14 +213,25 @@ async function loadNotes() {
 
 // Render sidebar notes list
 function renderSidebar() {
-    if (notes.length === 0) {
-        sidebarNotesList.innerHTML = '<p style="padding: 12px; color: #9b9a97; font-size: 0.85rem;">No notes yet</p>';
+    // Filter notes based on search query
+    const filteredNotes = notes.filter(note => {
+        const title = stripHtml(note.title).toLowerCase();
+        const content = stripHtml(note.content).toLowerCase();
+        return title.includes(searchQuery) || content.includes(searchQuery);
+    });
+
+    if (filteredNotes.length === 0) {
+        if (searchQuery) {
+            sidebarNotesList.innerHTML = '<p style="padding: 12px; color: #9b9a97; font-size: 0.85rem;">No notes found</p>';
+        } else {
+            sidebarNotesList.innerHTML = '<p style="padding: 12px; color: #9b9a97; font-size: 0.85rem;">No notes yet</p>';
+        }
         return;
     }
 
     sidebarNotesList.innerHTML = '';
     
-    notes.forEach(note => {
+    filteredNotes.forEach(note => {
         const noteItem = document.createElement('div');
         noteItem.className = 'note-item';
         if (note.id === currentNoteId) {
@@ -466,4 +479,10 @@ window.addEventListener('beforeunload', () => {
     if (currentNoteId !== null) {
         saveCurrentNote();
     }
+});
+
+// Search input
+searchInput.addEventListener('input', (e) => {
+    searchQuery = e.target.value.toLowerCase();
+    renderSidebar();
 });
