@@ -8,11 +8,13 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 
 ### 📄 Note Management
 - **Create notes** with title and rich-text content
-- **Auto-save** - Changes saved automatically after 1 second
+- **Auto-save** - Changes saved automatically after 1 second of inactivity
+- **Favorite notes** - Pin important notes to the top with star icon (⭐)
 - **Duplicate notes** - Clone existing notes with one click
 - **Delete notes** with confirmation prompt
 - **Export notes** as plain text files
-- **Sidebar navigation** - All notes listed for quick access
+- **Search notes** - Real-time filtering by title and content
+- **Sidebar navigation** - All notes listed with smart sorting (favorites first, then by last update)
 - Timestamp tracking (Created at / Updated at)
 
 ---
@@ -32,26 +34,30 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 ---
 
 ### 🎨 Customization Options
+- **Dark mode** - Toggle between light and dark themes with preference persistence
 - **Font selection**:
   - Default (System font)
   - Serif (Georgia)
   - Mono (Courier New)
 - **Text size toggle** - Small text mode for compact writing
 - **Full width mode** - Expanded editor for more writing space
-- **Settings menu** - Notion-style dropdown with all options
+- **Settings menu** - Notion-style dropdown with all customization options
 
 ---
 
 ### 🎨 User Interface
 - **Notion-inspired design** with sidebar + editor layout
 - **Split-pane interface**:
-  - Left sidebar with notes list
+  - Left sidebar with notes list and search bar
   - Right editor area with formatting tools
-- Minimalist black & white aesthetic
+- **Theme support**:
+  - Light mode (default) - Minimalist black & white aesthetic
+  - Dark mode - Easy on the eyes for night-time writing
 - Clean, distraction-free writing environment
 - Smooth hover animations and transitions
 - Active note highlighting in sidebar
-- Inline delete buttons (visible on hover)
+- Inline favorite and delete buttons (visible on hover)
+- CSS variables for easy theming
 
 ---
 
@@ -73,6 +79,7 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
   - `POST /api/Notes` – Create new note
   - `PUT /api/Notes/{id}` – Update note
   - `DELETE /api/Notes/{id}` – Delete note
+  - `PATCH /api/Notes/{id}/favorite` – Toggle favorite status
 - Async/await pattern for all HTTP requests
 - Error handling with user-friendly messages
 - CORS configured for local development
@@ -89,7 +96,7 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 - **Swagger UI** for API documentation and testing
 - **Clean architecture**:
   - `Models` – Data entities
-  - `Controllers` – API endpoints
+  - `Controllers` – API endpoints with RESTful design
   - `Data` – Database context and migrations
 
 ### Frontend (Vanilla JavaScript)
@@ -97,10 +104,12 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 - Modern **ES6+ syntax** with async/await
 - **Fetch API** for HTTP communication
 - **ContentEditable API** for rich text editing
+- **LocalStorage** for theme preference persistence
 - **DOM manipulation** for dynamic UI updates
+- **CSS Variables** for dynamic theming
 - Separation of concerns:
   - `index.html` – Structure
-  - `css/style.css` – Styling (Notion-inspired)
+  - `css/style.css` – Styling with theme support
   - `js/app.js` – Application logic
 
 ---
@@ -115,6 +124,7 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 | Content | nvarchar(max) | Note content (HTML format) |
 | CreatedAt | datetime2 | Creation timestamp (UTC) |
 | UpdatedAt | datetime2 | Last update timestamp (UTC) |
+| IsFavorite | bit | Favorite status for pinning notes |
 
 ---
 
@@ -150,10 +160,11 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 
 ### Frontend
 - **HTML5** – Semantic markup
-- **CSS3** – Modern styling with flexbox/grid
+- **CSS3** – Modern styling with CSS variables and flexbox/grid
 - **JavaScript (ES6+)** – Client-side logic
 - **Fetch API** – HTTP communication
 - **ContentEditable API** – Rich text editing
+- **LocalStorage API** – Theme preference persistence
 
 ---
 
@@ -166,21 +177,21 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 - ✅ Database setup with Entity Framework migrations
 - ✅ Notion-inspired UI with sidebar navigation
 - ✅ Rich text editor with formatting toolbar
-- ✅ Auto-save functionality
+- ✅ Auto-save functionality with debouncing
+- ✅ Search functionality with real-time filtering
+- ✅ Favorite notes (pin to top)
+- ✅ Dark mode with preference persistence
 - ✅ Font customization (Default, Serif, Mono)
 - ✅ Text size and width toggles
 - ✅ Note duplication
 - ✅ Export notes as text files
 - ✅ Keyboard shortcuts
 - ✅ CORS configuration for local development
+- ✅ Smart note sorting (favorites first, then by update time)
 
 ### Planned Features
 - 🔲 User authentication and authorization
 - 🔲 Note categories/folders
 - 🔲 Tags system
-- 🔲 Search functionality
-- 🔲 Dark mode toggle
-- 🔲 Markdown support
 - 🔲 Image uploads
-- 🔲 Collaborative editing
-- 🔲 Note sharing
+- 🔲 Mobile responsive design
