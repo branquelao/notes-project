@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NotesProjectAPI.Data;
+using NotesProjectAPI.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,34 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Auto-migrate e seed
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    // Aplica migrations
+    db.Database.Migrate();
+
+    // Adiciona dados iniciais se o banco estiver vazio
+    if (!db.Notes.Any())
+    {
+        db.Notes.AddRange(
+            new Note
+            {
+                Title = "Welcome to Notes Project!",
+                Content = "This is your first note. Start writing!",
+                IsFavorite = true
+            },
+            new Note
+            {
+                Title = "Getting Started",
+                Content = "You can format text, create lists, and more!"
+            }
+        );
+        db.SaveChanges();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
