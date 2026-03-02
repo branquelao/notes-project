@@ -19,6 +19,7 @@ const duplicateNoteOption = document.getElementById('duplicateNoteOption');
 const exportNoteOption = document.getElementById('exportNoteOption');
 const searchInput = document.getElementById('searchInput');
 const darkModeToggle = document.getElementById('darkModeToggle');
+const createLinkBtn = document.getElementById('createLinkBtn');
 
 // State
 let notes = [];
@@ -42,6 +43,21 @@ newNoteBtn.addEventListener('click', createNewNote);
 noteTitle.addEventListener('input', () => autoSave());
 noteContent.addEventListener('input', () => autoSave());
 
+// Handle link clicks
+noteContent.addEventListener('click', (e) => {
+    if (e.target.tagName === 'A') {
+        e.preventDefault();
+        window.open(e.target.href, '_blank');
+    }
+});
+
+// Auto-linkify when pasting URLs
+noteContent.addEventListener('paste', (e) => {
+    setTimeout(() => {
+        autoLinkify();
+    }, 100);
+});
+
 // Toolbar buttons
 toolbarBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -49,6 +65,12 @@ toolbarBtns.forEach(btn => {
         const command = btn.getAttribute('data-command');
         executeCommand(command);
     });
+});
+
+// Create link button
+createLinkBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    createLink();
 });
 
 // Menu button toggle
@@ -567,3 +589,60 @@ searchInput.addEventListener('input', (e) => {
     searchQuery = e.target.value.toLowerCase();
     renderSidebar();
 });
+
+// Create link from selection
+function createLink() {
+    const selection = window.getSelection();
+    const selectedText = selection.toString();
+    
+    if (!selectedText) {
+        alert('Please select text first');
+        return;
+    }
+    
+    const url = prompt('Enter URL:', 'https://');
+    
+    if (url && url.trim() !== '' && url !== 'https://') {
+        document.execCommand('createLink', false, url);
+        
+        // Make link open in new tab
+        const links = noteContent.querySelectorAll('a');
+        links.forEach(link => {
+            if (!link.hasAttribute('target')) {
+                link.setAttribute('target', '_blank');
+                link.setAttribute('rel', 'noopener noreferrer');
+            }
+        });
+        
+        noteContent.focus();
+    }
+}
+
+// Auto-linkify URLs in content
+function autoLinkify() {
+    const content = noteContent.innerHTML;
+    
+    // Regex to detect URLs
+    const urlRegex = /(https?:\/\/[^\s<]+)/g;
+    
+    // Replace plain text URLs with links
+    const linkedContent = content.replace(urlRegex, (url) => {
+        // Don't linkify if already in an <a> tag
+        if (content.indexOf(`href="${url}"`) !== -1) {
+            return url;
+        }
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
+    
+    if (linkedContent !== content) {
+        noteContent.innerHTML = linkedContent;
+        
+        // Restore cursor position at the end
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(noteContent);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+}

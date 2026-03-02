@@ -541,3 +541,23 @@ input:checked + .toggle-slider:before {
     gap: 4px;
     align-items: center;
 }
+
+/* Links inside editor */
+.note-content-input a {
+    color: #0066cc;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.note-content-input a:hover {
+    color: #0052a3;
+    text-decoration: underline;
+}
+
+body.dark-mode .note-content-input a {
+    color: #4da6ff;
+}
+
+body.dark-mode .note-content-input a:hover {
+    color: #66b3ff;
+}
