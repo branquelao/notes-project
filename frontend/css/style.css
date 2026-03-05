@@ -561,3 +561,32 @@ body.dark-mode .note-content-input a {
 body.dark-mode .note-content-input a:hover {
     color: #66b3ff;
 }
+
+/* Images inside editor */
+.note-content-input img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.note-content-input img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body.dark-mode .note-content-input img:hover {
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+/* Image resize handles */
+.note-content-input img.selected {
+    outline: 2px solid #0066cc;
+    outline-offset: 2px;
+}
+
+body.dark-mode .note-content-input img.selected {
+    outline-color: #4da6ff;
+}
