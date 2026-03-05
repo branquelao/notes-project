@@ -20,6 +20,7 @@ const exportNoteOption = document.getElementById('exportNoteOption');
 const searchInput = document.getElementById('searchInput');
 const darkModeToggle = document.getElementById('darkModeToggle');
 const createLinkBtn = document.getElementById('createLinkBtn');
+const insertImageBtn = document.getElementById('insertImageBtn');
 
 // State
 let notes = [];
@@ -71,6 +72,31 @@ toolbarBtns.forEach(btn => {
 createLinkBtn.addEventListener('click', (e) => {
     e.preventDefault();
     createLink();
+});
+
+// Insert image button
+insertImageBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    insertImage();
+});
+
+// Handle paste images
+noteContent.addEventListener('paste', (e) => {
+    const items = e.clipboardData.items;
+    
+    for (let item of items) {
+        if (item.type.indexOf('image') !== -1) {
+            e.preventDefault();
+            const blob = item.getAsFile();
+            insertImageFromBlob(blob);
+            return;
+        }
+    }
+    
+    // Auto-linkify URLs (código existente)
+    setTimeout(() => {
+        autoLinkify();
+    }, 100);
 });
 
 // Menu button toggle
@@ -557,6 +583,113 @@ function loadDarkModePreference() {
     }
 }
 
+// Insert image via file picker
+function insertImage() {
+    // Create hidden file input
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            insertImageFromBlob(file);
+        }
+    };
+    
+    input.click();
+}
+
+// Insert image from blob/file
+function insertImageFromBlob(blob) {
+    // Check file size (max 5MB)
+    if (blob.size > 5 * 1024 * 1024) {
+        alert('Image too large. Maximum size is 5MB.');
+        return;
+    }
+    
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+        const base64 = e.target.result;
+        
+        // Create image element
+        const img = document.createElement('img');
+        img.src = base64;
+        img.alt = 'Uploaded image';
+        img.style.maxWidth = '100%';
+        
+        // Insert at cursor position
+        insertNodeAtCursor(img);
+        
+        // Add line break after image
+        const br = document.createElement('br');
+        insertNodeAtCursor(br);
+        
+        // Trigger auto-save
+        noteContent.dispatchEvent(new Event('input'));
+    };
+    
+    reader.readAsDataURL(blob);
+}
+
+// Insert node at cursor position
+function insertNodeAtCursor(node) {
+    const selection = window.getSelection();
+    
+    if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(node);
+        
+        // Move cursor after inserted node
+        range.setStartAfter(node);
+        range.setEndAfter(node);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    } else {
+        // If no selection, append to end
+        noteContent.appendChild(node);
+    }
+    
+    noteContent.focus();
+}
+
+// Handle image clicks (optional - for future features like delete/resize)
+noteContent.addEventListener('click', (e) => {
+    // Handle link clicks (código existente)
+    if (e.target.tagName === 'A') {
+        e.preventDefault();
+        window.open(e.target.href, '_blank');
+        return;
+    }
+    
+    // Handle image clicks
+    if (e.target.tagName === 'IMG') {
+        // Toggle selection
+        const wasSelected = e.target.classList.contains('selected');
+        
+        // Remove selection from all images
+        noteContent.querySelectorAll('img').forEach(img => {
+            img.classList.remove('selected');
+        });
+        
+        // Toggle current image
+        if (!wasSelected) {
+            e.target.classList.add('selected');
+        }
+    }
+});
+
+// Deselect images when clicking elsewhere
+noteContent.addEventListener('click', (e) => {
+    if (e.target.tagName !== 'IMG') {
+        noteContent.querySelectorAll('img').forEach(img => {
+            img.classList.remove('selected');
+        });
+    }
+});
+
 // Utility functions
 function escapeHtml(text) {
     const div = document.createElement('div');
@@ -589,60 +722,3 @@ searchInput.addEventListener('input', (e) => {
     searchQuery = e.target.value.toLowerCase();
     renderSidebar();
 });
-
-// Create link from selection
-function createLink() {
-    const selection = window.getSelection();
-    const selectedText = selection.toString();
-    
-    if (!selectedText) {
-        alert('Please select text first');
-        return;
-    }
-    
-    const url = prompt('Enter URL:', 'https://');
-    
-    if (url && url.trim() !== '' && url !== 'https://') {
-        document.execCommand('createLink', false, url);
-        
-        // Make link open in new tab
-        const links = noteContent.querySelectorAll('a');
-        links.forEach(link => {
-            if (!link.hasAttribute('target')) {
-                link.setAttribute('target', '_blank');
-                link.setAttribute('rel', 'noopener noreferrer');
-            }
-        });
-        
-        noteContent.focus();
-    }
-}
-
-// Auto-linkify URLs in content
-function autoLinkify() {
-    const content = noteContent.innerHTML;
-    
-    // Regex to detect URLs
-    const urlRegex = /(https?:\/\/[^\s<]+)/g;
-    
-    // Replace plain text URLs with links
-    const linkedContent = content.replace(urlRegex, (url) => {
-        // Don't linkify if already in an <a> tag
-        if (content.indexOf(`href="${url}"`) !== -1) {
-            return url;
-        }
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-    });
-    
-    if (linkedContent !== content) {
-        noteContent.innerHTML = linkedContent;
-        
-        // Restore cursor position at the end
-        const range = document.createRange();
-        const sel = window.getSelection();
-        range.selectNodeContents(noteContent);
-        range.collapse(false);
-        sel.removeAllRanges();
-        sel.addRange(range);
-    }
-}
