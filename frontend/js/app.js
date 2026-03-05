@@ -690,6 +690,18 @@ noteContent.addEventListener('click', (e) => {
     }
 });
 
+// Delete selected image with Delete key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+        const selectedImg = noteContent.querySelector('img.selected');
+        if (selectedImg) {
+            e.preventDefault();
+            selectedImg.remove();
+            noteContent.dispatchEvent(new Event('input'));
+        }
+    }
+});
+
 // Utility functions
 function escapeHtml(text) {
     const div = document.createElement('div');
