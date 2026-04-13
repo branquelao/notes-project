@@ -189,6 +189,8 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 - ✅ CORS configuration for local development
 - ✅ Smart note sorting (favorites first, then by update time)
 
+### 📌 Developing Database Script in New Branch
+
 ### Planned Features
 - 🔲 User authentication and authorization
 - 🔲 Note categories/folders
