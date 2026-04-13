@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NotesProjectAPI.Data;
+using Dapper;
+using NotesProjectAPI.Database;
 using NotesProjectAPI.Models;
 
 namespace NotesProjectAPI.Controllers
@@ -8,43 +9,70 @@ namespace NotesProjectAPI.Controllers
     [ApiController]
     public class NotesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly DatabaseService _databaseService;
 
-        public NotesController(ApplicationDbContext context)
+        public NotesController(DatabaseService databaseService)
         {
-            _context = context;
+            _databaseService = databaseService;
         }
 
         // GET: api/Notes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Note>>> GetNotes()
         {
-            return await _context.Notes.ToListAsync();
+            using var connection = _databaseService.CreateConnection();
+            
+            var notes = await connection.QueryAsync<Note>(
+                "SELECT * FROM Notes ORDER BY CreatedAt DESC");
+
+            return Ok(notes);
         }
 
         // GET: api/Notes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Note>> GetNote(int id)
         {
-            var note = await _context.Notes.FindAsync(id);
+            using var connection = _databaseService.CreateConnection();
+
+            var note = await connection .QueryFirstOrDefaultAsync<Note>(
+                "SELECT * FROM Notes WHERE Id = @Id", new { Id = id });
 
             if (note == null)
             {
                 return NotFound();
             }
 
-            return note;
+            return Ok(note);
         }
 
         // POST: api/Notes
         [HttpPost]
         public async Task<ActionResult<Note>> CreateNote(Note note)
         {
-            note.CreatedAt = DateTime.UtcNow;
-            note.UpdatedAt = DateTime.UtcNow;
+            using var connection = _databaseService.CreateConnection();
 
-            _context.Notes.Add(note);
-            await _context.SaveChangesAsync();
+            var now = DateTime.UtcNow;
+
+            var sql = @"
+                INSERT INTO Notes
+                (Title, Content, CreatedAt, UpdatedAt, IsFavorite)
+                VALUES
+                (@Title, @Content, @CreatedAt, @UpdatedAt, @IsFavorite);
+
+                SELECT last_insert_rowid()";
+
+            var id = await connection.ExecuteScalarAsync<long>(sql, new
+            {
+                note.Title,
+                note.Content,
+                CreatedAt = now,
+                UpdatedAt = now,
+                note.IsFavorite
+            });
+
+            note.Id = (int)id;
+            note.CreatedAt = now;
+            note.UpdatedAt = now;
 
             return CreatedAtAction(nameof(GetNote), new { id = note.Id }, note);
         }
@@ -58,20 +86,29 @@ namespace NotesProjectAPI.Controllers
                 return BadRequest();
             }
 
-            note.UpdatedAt = DateTime.UtcNow;
-            _context.Entry(note).State = EntityState.Modified;
+            using var connection = _databaseService.CreateConnection();
 
-            try
+            var sql = @"
+                UPDATE Notes
+                SET
+                    Title = @Title,
+                    Content = @Content,
+                    UpdatedAt = @UpdatedAt,
+                    IsFavorite = @IsFavorite
+                WHERE Id = @Id";
+
+            var rowsAffected = await connection.ExecuteAsync(sql, new
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
+                note.Title,
+                note.Content,
+                UpdatedAt = DateTime.UtcNow,
+                note.IsFavorite,
+                Id = id
+            });
+
+            if(rowsAffected == 0)
             {
-                if (!NoteExists(id))
-                {
-                    return NotFound();
-                }
-                throw;
+                return NotFound();
             }
 
             return NoContent();
@@ -81,14 +118,15 @@ namespace NotesProjectAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteNote(int id)
         {
-            var note = await _context.Notes.FindAsync(id);
-            if (note == null)
+            using var connection = _databaseService.CreateConnection();
+
+            var rowsAffected = await connection.ExecuteAsync(
+                "DELETE FROM Notes WHERE Id = @Id", new { Id = id });
+
+            if (rowsAffected == 0)
             {
                 return NotFound();
             }
-
-            _context.Notes.Remove(note);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -97,7 +135,10 @@ namespace NotesProjectAPI.Controllers
         [HttpPatch("{id}/favorite")]
         public async Task<IActionResult> ToggleFavorite(int id)
         {
-            var note = await _context.Notes.FindAsync(id);
+            using var connection = _databaseService.CreateConnection();
+
+            var note = await connection.QueryFirstOrDefaultAsync<Note>(
+                "SELECT * FROM Notes WHERE Id = @Id", new { Id = id });
 
             if (note == null)
             {
@@ -107,14 +148,13 @@ namespace NotesProjectAPI.Controllers
             note.IsFavorite = !note.IsFavorite;
             note.UpdatedAt = DateTime.UtcNow;
 
-            await _context.SaveChangesAsync();
+            await connection.ExecuteAsync(@"
+                UPDATE Notes
+                SET IsFavorite = @IsFavorite,
+                    UpdatedAt = @UpdatedAt
+                WHERE Id = @Id", note);
 
             return Ok(note);
-        }
-
-        private bool NoteExists(int id)
-        {
-            return _context.Notes.Any(e => e.Id == id);
         }
     }
 }
