@@ -1,5 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using NotesProjectAPI.Data;
+using NotesProjectAPI.Database;
 using NotesProjectAPI.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,8 +9,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Register DbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddSingleton<DatabaseService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -29,29 +27,8 @@ var app = builder.Build();
 // Auto-migrate e seed
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-    // Aplica migrations
-    db.Database.Migrate();
-
-    // Adiciona dados iniciais se o banco estiver vazio
-    if (!db.Notes.Any())
-    {
-        db.Notes.AddRange(
-            new Note
-            {
-                Title = "Welcome to Notes Project!",
-                Content = "This is your first note. Start writing!",
-                IsFavorite = true
-            },
-            new Note
-            {
-                Title = "Getting Started",
-                Content = "You can format text, create lists, and more!"
-            }
-        );
-        db.SaveChanges();
-    }
+    var db = scope.ServiceProvider.GetRequiredService<DatabaseService>();
+    await db.InitializeDatabaseAsync();
 }
 
 // Configure the HTTP request pipeline.

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NotesProjectAPI.Data;
 using NotesProjectAPI.Models;
 
