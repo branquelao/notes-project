@@ -57,7 +57,7 @@ namespace NotesProjectAPI.Database
                 {
                     Title1 = "Welcome to Notes Project!",
                     Content1 = "This is your first note. Start writing!",
-                    Favorite = 1,
+                    Favorite1 = 1,
 
                     Title2 = "Getting Started",
                     Content2 = "You can format text, create lists, and more!",
