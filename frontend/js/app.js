@@ -302,7 +302,7 @@ function renderSidebar() {
         }
         
         // Get plain text from HTML for sidebar display
-        const plainTitle = stripHtml(note.title) || 'Untitled';
+        const plainTitle = stripHtml(note.title) || 'New note';
 
         noteItem.innerHTML = `
             <div class="note-item-content">
@@ -357,7 +357,7 @@ async function createNewNote() {
     }
     
     const newNote = {
-        title: 'Untitled',
+        title: 'New note',
         content: ''
     };
     
@@ -426,7 +426,7 @@ function exportNote() {
     const note = notes.find(n => n.id === currentNoteId);
     if (!note) return;
     
-    const title = stripHtml(note.title) || 'Untitled';
+    const title = stripHtml(note.title) || 'New note';
     const content = stripHtml(note.content);
     const fullContent = `${title}\n\n${content}`;
     
@@ -466,7 +466,7 @@ async function saveCurrentNote() {
     
     const updatedNote = {
         id: currentNoteId,
-        title: noteTitle.value.trim() || 'Untitled',
+        title: noteTitle.value.trim() || 'New note',
         content: noteContent.innerHTML, // Save as HTML
         isFavorite: note.IsFavorite
     };
@@ -529,10 +529,6 @@ async function toggleFavorite(id, event) {
 // Delete note
 async function deleteNote(id, event) {
     event.stopPropagation(); // Prevent note selection
-    
-    if (!confirm('Are you sure you want to delete this note?')) {
-        return;
-    }
     
     try {
         const response = await fetch(`${API_URL}/${id}`, {
