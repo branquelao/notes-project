@@ -467,7 +467,8 @@ async function saveCurrentNote() {
     const updatedNote = {
         id: currentNoteId,
         title: noteTitle.value.trim() || 'Untitled',
-        content: noteContent.innerHTML // Save as HTML
+        content: noteContent.innerHTML, // Save as HTML
+        isFavorite: note.IsFavorite
     };
     
     try {
@@ -721,13 +722,6 @@ function stripHtml(html) {
     div.innerHTML = html;
     return div.textContent || div.innerText || '';
 }
-
-// Save on page unload
-window.addEventListener('beforeunload', () => {
-    if (currentNoteId !== null) {
-        saveCurrentNote();
-    }
-});
 
 // Search input
 searchInput.addEventListener('input', (e) => {
