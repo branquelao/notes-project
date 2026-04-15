@@ -91,13 +91,13 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 
 ### Backend (C# .NET)
 - **ASP.NET Core Web API** (.NET 6+)
-- **Entity Framework Core** with Code-First approach
-- **SQL Server LocalDB** for data persistence
+- **SQLite** for lightweight local data persistence
+- **Dapper** for efficient SQL query execution
 - **Swagger UI** for API documentation and testing
 - **Clean architecture**:
   - `Models` – Data entities
-  - `Controllers` – API endpoints with RESTful design
-  - `Data` – Database context and migrations
+  - `Controllers` – RESTful API endpoints
+  - `Database` – connection service, initialization script, and seed logic
 
 ### Frontend (Vanilla JavaScript)
 - **Pure HTML/CSS/JavaScript** (no frameworks)
@@ -134,12 +134,13 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 - Visual Studio 2022 (or later)
 - .NET 6.0 SDK (or later)
 - Visual Studio Code (for frontend development)
-- SQL Server LocalDB (included with Visual Studio)
+- SQLite (handled automatically by the project)
 
 ### Running the Backend
 1. Open `backend/NotesProjectAPI/NotesProjectAPI.sln` in Visual Studio
-2. Press **F5** to run the API
-3. Swagger UI opens automatically at `https://localhost:7269/swagger`
+2. Run the API with **F5**
+3. The SQLite database is automatically initialized and seeded on startup
+4. Swagger UI opens automatically at `https://localhost:7269/swagger`
 
 ### Running the Frontend
 1. Open the `frontend` folder in VS Code
@@ -154,8 +155,8 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 ### Backend
 - **C# .NET** – Core application logic
 - **ASP.NET Core** – Web API framework
-- **Entity Framework Core** – ORM for database access
-- **SQL Server** – Relational database
+- **SQLite** – Lightweight relational database
+- **Dapper** – Micro ORM for SQL execution
 - **Swagger/OpenAPI** – API documentation
 
 ### Frontend
@@ -174,7 +175,7 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 
 ### Completed
 - ✅ Backend API with full CRUD operations
-- ✅ Database setup with Entity Framework migrations
+- ✅ Database setup with SQLite and SQL queries
 - ✅ Notion-inspired UI with sidebar navigation
 - ✅ Rich text editor with formatting toolbar
 - ✅ Auto-save functionality with debouncing
@@ -188,12 +189,11 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 - ✅ Keyboard shortcuts
 - ✅ CORS configuration for local development
 - ✅ Smart note sorting (favorites first, then by update time)
-
-### 📌 Developing Database Script in New Branch
+- ✅ Image uploads
 
 ### Planned Features
 - 🔲 User authentication and authorization
 - 🔲 Note categories/folders
+- 🔲 Movable Text Lines
 - 🔲 Tags system
-- 🔲 Image uploads
 - 🔲 Mobile responsive design
