@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Dapper;
+﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using NotesProjectAPI.Database;
 using NotesProjectAPI.Models;
+using System.Security.Claims;
 
 namespace NotesProjectAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
+    [Route("api/[controller]")]
     public class NotesController : ControllerBase
     {
         private readonly DatabaseService _databaseService;
@@ -21,10 +25,12 @@ namespace NotesProjectAPI.Controllers
         public async Task<ActionResult<IEnumerable<Note>>> GetNotes()
         {
             using var connection = _databaseService.CreateConnection();
-            
-            var notes = await connection.QueryAsync<Note>(
-                "SELECT * FROM Notes ORDER BY CreatedAt DESC");
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
+            var notes = await connection.QueryAsync<Note>(
+                "SELECT * FROM Notes WHERE UserId = @UserId ORDER BY CreatedAt DESC",
+                new { UserId = userId }
+);
             return Ok(notes);
         }
 
@@ -33,9 +39,11 @@ namespace NotesProjectAPI.Controllers
         public async Task<ActionResult<Note>> GetNote(int id)
         {
             using var connection = _databaseService.CreateConnection();
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var note = await connection .QueryFirstOrDefaultAsync<Note>(
-                "SELECT * FROM Notes WHERE Id = @Id", new { Id = id });
+                "SELECT * FROM Notes WHERE Id = @Id AND UserId = @UserId",
+                new { Id = id, UserId = userId });
 
             if (note == null)
             {
@@ -50,19 +58,21 @@ namespace NotesProjectAPI.Controllers
         public async Task<ActionResult<Note>> CreateNote(Note note)
         {
             using var connection = _databaseService.CreateConnection();
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var now = DateTime.UtcNow;
 
             var sql = @"
                 INSERT INTO Notes
-                (Title, Content, CreatedAt, UpdatedAt, IsFavorite)
+                (UserId, Title, Content, CreatedAt, UpdatedAt, IsFavorite)
                 VALUES
-                (@Title, @Content, @CreatedAt, @UpdatedAt, @IsFavorite);
+                (@UserId, @Title, @Content, @CreatedAt, @UpdatedAt, @IsFavorite);
 
                 SELECT last_insert_rowid()";
 
             var id = await connection.ExecuteScalarAsync<long>(sql, new
             {
+                UserId = userId,
                 note.Title,
                 note.Content,
                 CreatedAt = now,
@@ -87,6 +97,7 @@ namespace NotesProjectAPI.Controllers
             }
 
             using var connection = _databaseService.CreateConnection();
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var sql = @"
                 UPDATE Notes
@@ -95,7 +106,7 @@ namespace NotesProjectAPI.Controllers
                     Content = @Content,
                     UpdatedAt = @UpdatedAt,
                     IsFavorite = @IsFavorite
-                WHERE Id = @Id";
+                WHERE Id = @Id AND UserId = @UserId";
 
             var rowsAffected = await connection.ExecuteAsync(sql, new
             {
@@ -103,7 +114,8 @@ namespace NotesProjectAPI.Controllers
                 note.Content,
                 UpdatedAt = DateTime.UtcNow,
                 note.IsFavorite,
-                Id = id
+                Id = id,
+                UserId = userId
             });
 
             if(rowsAffected == 0)
@@ -119,9 +131,11 @@ namespace NotesProjectAPI.Controllers
         public async Task<IActionResult> DeleteNote(int id)
         {
             using var connection = _databaseService.CreateConnection();
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var rowsAffected = await connection.ExecuteAsync(
-                "DELETE FROM Notes WHERE Id = @Id", new { Id = id });
+                "DELETE FROM Notes WHERE Id = @Id AND UserId = @UserId",
+                new { Id = id, UserId = userId });
 
             if (rowsAffected == 0)
             {
@@ -136,9 +150,10 @@ namespace NotesProjectAPI.Controllers
         public async Task<IActionResult> ToggleFavorite(int id)
         {
             using var connection = _databaseService.CreateConnection();
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var note = await connection.QueryFirstOrDefaultAsync<Note>(
-                "SELECT * FROM Notes WHERE Id = @Id", new { Id = id });
+                "SELECT * FROM Notes WHERE Id = @Id AND UserId = @UserId", new { Id = id, UserId = userId });
 
             if (note == null)
             {
@@ -152,7 +167,14 @@ namespace NotesProjectAPI.Controllers
                 UPDATE Notes
                 SET IsFavorite = @IsFavorite,
                     UpdatedAt = @UpdatedAt
-                WHERE Id = @Id", note);
+                WHERE Id = @Id AND UserId = @UserId",
+                new
+                {
+                    note.IsFavorite,
+                    note.UpdatedAt,
+                    note.Id,
+                    UserId = userId
+                });
 
             return Ok(note);
         }
