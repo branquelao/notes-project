@@ -23,11 +23,19 @@ namespace NotesProjectAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(User user)
+        public async Task<IActionResult> Register(RegisterRequest request)
         {
             using var connection = _databaseService.CreateConnection();
 
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+            // Verifies if Email already exists
+            var existing = await connection.QueryFirstOrDefaultAsync<User>(
+                "SELECT * FROM Users WHERE Email = @Email",
+                new { request.Email });
+
+            if (existing != null)
+                return BadRequest(new { message = "Email already registered" });
+
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
             var sql = @"
                 INSERT INTO Users (Email, PasswordHash, Name, CreatedAt)
@@ -35,26 +43,26 @@ namespace NotesProjectAPI.Controllers
 
             await connection.ExecuteAsync(sql, new
             {
-                user.Email,
+                request.Email,
                 PasswordHash = passwordHash,
-                user.Name,
-                CreatedAt = DateTime.UtcNow
+                request.Name,
+                CreatedAt = DateTime.UtcNow.ToString("o")
             });
 
-            return Ok(new { message = "User created" });
+            return Ok(new { message = "User created successfully" });
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(User login)
+        public async Task<IActionResult> Login(LoginRequest request)
         {
             using var connection = _databaseService.CreateConnection();
 
             var user = await connection.QueryFirstOrDefaultAsync<User>(
                 "SELECT * FROM Users WHERE Email = @Email",
-                new { login.Email });
+                new { request.Email });
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(login.PasswordHash, user.PasswordHash))
-                return Unauthorized("Invalid credentials");
+            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+                return Unauthorized(new { message = "Invalid credentials" });
 
             var token = GenerateJwtToken(user);
 
@@ -80,8 +88,8 @@ namespace NotesProjectAPI.Controllers
             };
 
             var token = new JwtSecurityToken(
-                issuer: "NotesAPI",
-                audience: "NotesAPI",
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(2),
                 signingCredentials: creds

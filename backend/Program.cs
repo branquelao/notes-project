@@ -1,15 +1,69 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using NotesProjectAPI.Database;
-using NotesProjectAPI.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-// Register DbContext
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Notes API",
+        Version = "v1"
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter: Bearer {your JWT token}"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
+// Register DatabaseService
 builder.Services.AddSingleton<DatabaseService>();
+
+// Configure JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+            )
+        };
+    });
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -24,11 +78,11 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Auto-migrate e seed
+// Initialize database on startup
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<DatabaseService>();
-    await db.InitializeDatabaseAsync();
+    var dbService = scope.ServiceProvider.GetRequiredService<DatabaseService>();
+    await dbService.InitializeDatabaseAsync();
 }
 
 // Configure the HTTP request pipeline.
@@ -43,7 +97,9 @@ app.UseHttpsRedirection();
 // Use CORS
 app.UseCors("AllowFrontend");
 
-app.UseAuthorization();
+app.UseAuthentication();  // Validates Token Before
+app.UseAuthorization();   // Verifies Permissions After
+
 app.MapControllers();
 
 app.Run();

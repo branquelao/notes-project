@@ -1,3 +1,24 @@
+// Get Token Function
+function getToken() {
+    return localStorage.getItem("token");
+}
+
+// Authentication Fetch
+function authFetch(url, options = {}) {
+    return fetch(url, {
+        ...options,
+        headers: {
+            ...(options.headers || {}),
+            'Authorization': `Bearer ${getToken()}`
+        }
+    }).then(response => {
+        if (response.status === 401) {
+            console.error("Unauthorized - invalid or expired token");
+        }
+        return response;
+    });
+}
+
 // API Base URL
 const API_URL = 'https://localhost:7269/api/Notes';
 
@@ -253,7 +274,7 @@ function applyWidth() {
 // Load all notes from API
 async function loadNotes() {
     try {
-        const response = await fetch(API_URL);
+        const response = await authFetch(API_URL);
         notes = await response.json();
         
         // Sort: favorites first, then by UpdatedAt (most recent first)
@@ -362,7 +383,7 @@ async function createNewNote() {
     };
     
     try {
-        const response = await fetch(API_URL, {
+        const response = await authFetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -399,7 +420,7 @@ async function duplicateNote() {
     };
     
     try {
-        const response = await fetch(API_URL, {
+        const response = await authFetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -472,7 +493,7 @@ async function saveCurrentNote() {
     };
     
     try {
-        const response = await fetch(`${API_URL}/${currentNoteId}`, {
+        const response = await authFetch(`${API_URL}/${currentNoteId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -498,7 +519,7 @@ async function toggleFavorite(id, event) {
     event.stopPropagation(); // Prevent note selection
     
     try {
-        const response = await fetch(`${API_URL}/${id}/favorite`, {
+        const response = await authFetch(`${API_URL}/${id}/favorite`, {
             method: 'PATCH'
         });
         
@@ -531,7 +552,7 @@ async function deleteNote(id, event) {
     event.stopPropagation(); // Prevent note selection
     
     try {
-        const response = await fetch(`${API_URL}/${id}`, {
+        const response = await authFetch(`${API_URL}/${id}`, {
             method: 'DELETE'
         });
         
