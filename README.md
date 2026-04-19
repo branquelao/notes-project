@@ -19,6 +19,14 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 
 ---
 
+### 🔐 Authentication
+- **User registration and login** with JWT authentication
+- **Protected endpoints** – Notes are only accessible to authenticated users
+- **User-based data isolation** – Each user can only access their own notes
+- Passwords securely stored using hashing (BCrypt)
+
+---
+
 ### ✍️ Rich Text Editor
 - **Formatting toolbar** with essential text styling:
   - **Bold** (Ctrl+B)
@@ -73,6 +81,9 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 
 ### 🔌 API Integration
 - RESTful API communication
+- **Authentication endpoints**:
+  - `POST /api/auth/register` – Create a new user
+  - `POST /api/auth/login` – Authenticate user and receive JWT token
 - **CRUD operations**:
   - `GET /api/Notes` – List all notes
   - `GET /api/Notes/{id}` – Get specific note
@@ -116,15 +127,25 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 
 ## 🗄️ Database Schema
 
+### Users Table
+| Column | Type | Description |
+|--------|------|-------------|
+| Id | int (PK) | Auto-increment primary key |
+| Email | text | User email (unique) |
+| PasswordHash | text | Hashed password |
+| Name | text | User name |
+| CreatedAt | text | Creation timestamp (UTC) |
+
 ### Notes Table
 | Column | Type | Description |
 |--------|------|-------------|
 | Id | int (PK) | Auto-increment primary key |
-| Title | nvarchar(max) | Note title (plain text) |
-| Content | nvarchar(max) | Note content (HTML format) |
-| CreatedAt | datetime2 | Creation timestamp (UTC) |
-| UpdatedAt | datetime2 | Last update timestamp (UTC) |
-| IsFavorite | bit | Favorite status for pinning notes |
+| Title | text | Note title |
+| Content | text | Note content (HTML format) |
+| CreatedAt | text | Creation timestamp (UTC) |
+| UpdatedAt | text | Last update timestamp (UTC) |
+| IsFavorite | integer | Favorite status (0 or 1) |
+| UserId | int (FK → Users.Id) | Owner of the note |
 
 ---
 
@@ -139,33 +160,86 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 ### Running the Backend
 1. Open `backend/NotesProjectAPI/NotesProjectAPI.sln` in Visual Studio
 2. Run the API with **F5**
-3. The SQLite database is automatically initialized and seeded on startup
+3. The SQLite database is automatically initialized on startup
 4. Swagger UI opens automatically at `https://localhost:7269/swagger`
 
+---
+
+### 🔑 Testing Authentication (Swagger)
+
+1. Open Swagger UI: https://localhost:7269/swagger
+
+2. Register a new user:
+   - `POST /api/auth/register`
+
+3. Login:
+   - `POST /api/auth/login`
+   - Copy the returned **JWT token**
+
+4. Authorize:
+   - Click the 🔒 **Authorize** button
+   - Enter: `Bearer YOUR_TOKEN_HERE`
+
+5. Access protected endpoints (e.g. `GET /api/Notes`)
+
+---
+
 ### Running the Frontend
-1. Open the `frontend` folder in VS Code
-2. Install **Live Server** extension
-3. Right-click `index.html` → **Open with Live Server**
-4. Frontend opens at `http://127.0.0.1:5500`
+
+1. Open the `frontend` folder in VS Code  
+2. Install **Live Server**  
+3. Right-click `index.html` → **Open with Live Server**  
+4. Open: `http://127.0.0.1:5500`
+
+---
+
+### 🌐 Using the Frontend with JWT (DevTools)
+
+This flow assumes you have already authenticated via Swagger and obtained a JWT token.
+
+⚠️ The frontend does not yet implement authentication UI.
+
+#### Steps:
+
+1. (First time only) Register:
+   - `POST /api/auth/register`
+
+2. Login:
+   - `POST /api/auth/login`
+   - Copy the JWT token
+
+3. Open the frontend:
+   `http://127.0.0.1:5500`
+
+4. Open DevTools (**F12**) → Console
+
+5. Run:
+`localStorage.setItem("token", "YOUR_JWT_TOKEN_HERE");`
+
+6. Reload the page
+
+⚠️ Important:  
+Run this command in the frontend (port 5500).  
+Running it in Swagger will not work due to different `localStorage` contexts.
 
 ---
 
 ## 🛠️ Technologies
 
 ### Backend
-- **C# .NET** – Core application logic
-- **ASP.NET Core** – Web API framework
-- **SQLite** – Lightweight relational database
-- **Dapper** – Micro ORM for SQL execution
-- **Swagger/OpenAPI** – API documentation
+- **C# .NET**
+- **ASP.NET Core**
+- **SQLite**
+- **Dapper**
+- **Swagger/OpenAPI**
 
 ### Frontend
-- **HTML5** – Semantic markup
-- **CSS3** – Modern styling with CSS variables and flexbox/grid
-- **JavaScript (ES6+)** – Client-side logic
-- **Fetch API** – HTTP communication
-- **ContentEditable API** – Rich text editing
-- **LocalStorage API** – Theme preference persistence
+- **HTML5**
+- **CSS3**
+- **JavaScript (ES6+)**
+- **Fetch API**
+- **ContentEditable API**
+- **LocalStorage API**
 
 ---
 
@@ -174,26 +248,28 @@ A **full-stack note-taking application** inspired by **Notion**, built with **AS
 🚧 **In development**
 
 ### Completed
-- ✅ Backend API with full CRUD operations
-- ✅ Database setup with SQLite and SQL queries
-- ✅ Notion-inspired UI with sidebar navigation
-- ✅ Rich text editor with formatting toolbar
-- ✅ Auto-save functionality with debouncing
-- ✅ Search functionality with real-time filtering
-- ✅ Favorite notes (pin to top)
-- ✅ Dark mode with preference persistence
-- ✅ Font customization (Default, Serif, Mono)
-- ✅ Text size and width toggles
-- ✅ Note duplication
-- ✅ Export notes as text files
-- ✅ Keyboard shortcuts
-- ✅ CORS configuration for local development
-- ✅ Smart note sorting (favorites first, then by update time)
-- ✅ Image uploads
+- ✅ Full CRUD API
+- ✅ SQLite database integration
+- ✅ JWT authentication
+- ✅ Protected endpoints
+- ✅ User-based notes
+- ✅ Rich text editor
+- ✅ Auto-save
+- ✅ Favorites system
+- ✅ Search
+- ✅ Dark mode
+- ✅ UI customization
+- ✅ Image upload support
 
 ### Planned Features
-- 🔲 User authentication and authorization
-- 🔲 Note categories/folders
-- 🔲 Movable Text Lines
+- 🔲 Frontend authentication UI
+- 🔲 Categories / folders
 - 🔲 Tags system
-- 🔲 Mobile responsive design
+- 🔲 Mobile responsiveness
+
+---
+
+## ⚠️ Known Limitations
+- No frontend login UI yet
+- JWT must be manually injected via DevTools
+- No refresh token (fixed expiration)
