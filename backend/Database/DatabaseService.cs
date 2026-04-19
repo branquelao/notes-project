@@ -39,7 +39,7 @@ namespace NotesProjectAPI.Database
             command.CommandText = script;
             await command.ExecuteNonQueryAsync();
 
-            //Seed
+            /*Seed
             var count = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Notes");
 
             if(count == 0)
@@ -66,7 +66,7 @@ namespace NotesProjectAPI.Database
                     CreatedAt = now,
                     UpdatedAt = now
                 });
-            }
+            }*/
         }
     }
 }

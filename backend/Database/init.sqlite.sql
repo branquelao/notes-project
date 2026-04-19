@@ -1,5 +1,5 @@
 ﻿-- Create Users table
-CREATE TABLE Users (
+CREATE TABLE IF NOT EXISTS Users (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     Email TEXT NOT NULL UNIQUE,
     PasswordHash TEXT NOT NULL,
