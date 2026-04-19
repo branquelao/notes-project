@@ -489,7 +489,7 @@ async function saveCurrentNote() {
         id: currentNoteId,
         title: noteTitle.value.trim() || 'New note',
         content: noteContent.innerHTML, // Save as HTML
-        isFavorite: note.IsFavorite
+        isFavorite: note.isFavorite
     };
     
     try {
