@@ -3,6 +3,23 @@ function getToken() {
     return localStorage.getItem("token");
 }
 
+// Logout function
+function logout() {
+    // Remove authentication token
+    localStorage.removeItem("token");
+
+    // Optional: clear any app state (defensive)
+    notes = [];
+    currentNoteId = null;
+
+    sidebarNotesList.innerHTML = '';
+    noteTitle.value = '';
+    noteContent.innerHTML = '';
+
+    // Redirect to auth page
+    window.location.href = 'auth.html';
+}
+
 // Authentication Fetch
 function authFetch(url, options = {}) {
     return fetch(url, {
@@ -13,10 +30,23 @@ function authFetch(url, options = {}) {
         }
     }).then(response => {
         if (response.status === 401) {
-            console.error("Unauthorized - invalid or expired token");
+            // Token expired or invalid → clear and redirect
+            localStorage.removeItem("token");
+            window.location.href = 'auth.html';
+            return Promise.reject('Unauthorized');
         }
         return response;
     });
+}
+
+// Redirect to login if no token is found
+function enforceAuth() {
+    const token = getToken();
+
+    if (!token) {
+        // No token -> user is not authenticated
+        window.location.href = 'auth.html';
+    }
 }
 
 // API Base URL
@@ -42,6 +72,7 @@ const searchInput = document.getElementById('searchInput');
 const darkModeToggle = document.getElementById('darkModeToggle');
 const createLinkBtn = document.getElementById('createLinkBtn');
 const insertImageBtn = document.getElementById('insertImageBtn');
+const logoutOption = document.getElementById('logoutOption');
 
 // State
 let notes = [];
@@ -54,6 +85,7 @@ let searchQuery = '';
 
 // Load notes when page loads
 document.addEventListener('DOMContentLoaded', () => {
+    enforceAuth();
     loadDarkModePreference();
     loadNotes();
 });
@@ -181,6 +213,14 @@ exportNoteOption.addEventListener('click', () => {
         exportNote();
     }
 });
+
+// Logout option
+if (logoutOption) {
+    logoutOption.addEventListener('click', () => {
+        dropdownMenu.classList.remove('active');
+        logout();
+    });
+}
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
@@ -719,13 +759,6 @@ document.addEventListener('keydown', (e) => {
         }
     }
 });
-
-// Utility functions
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
 
 // Utility functions
 function escapeHtml(text) {
