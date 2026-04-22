@@ -15,6 +15,7 @@ const registerSuccess = document.getElementById("registerSuccess");
 
 // If user already has token, redirect to main app
 document.addEventListener('DOMContentLoaded', () => {
+    loadDarkModePreference();
     const token = localStorage.getItem("token");
 
     if (token) {

@@ -1,4 +1,3 @@
-/* Reutilizando o mesmo design system */
 :root {
     --bg-primary: #ffffff;
     --bg-secondary: #f7f7f5;
@@ -46,7 +45,7 @@ body {
     max-width: 380px;
 }
 
-/* Remove "card pesado" */
+/* Remove "heavy card" */
 .auth-card {
     background: transparent;
     padding: 0;
@@ -101,12 +100,13 @@ body {
     border-color: var(--text-primary);
 }
 
-/* Button estilo do app */
+/* App Style Button */
 .btn-primary {
     width: 100%;
     padding: 10px;
 
     background: var(--bg-primary);
+    color: var(--text-primary);
     border: 1px solid var(--border-secondary);
     border-radius: 4px;
 
