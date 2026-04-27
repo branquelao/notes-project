@@ -1,3 +1,7 @@
+window.addEventListener('beforeunload', () => {
+    console.log('PAGE IS RELOADING');
+});
+
 // Get Token Function
 function getToken() {
     return localStorage.getItem("token");
