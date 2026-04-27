@@ -97,6 +97,9 @@ app.UseHttpsRedirection();
 // Use CORS
 app.UseCors("AllowFrontend");
 
+app.UseDefaultFiles(); // Serve index.html by default
+app.UseStaticFiles(); // enables wwwroot folder for static files
+
 app.UseAuthentication();  // Validates Token Before
 app.UseAuthorization();   // Verifies Permissions After
 

@@ -2,6 +2,8 @@
 
 A **full-stack, authenticated note-taking application** inspired by **Notion**, built with **ASP.NET Core Web API** and **vanilla JavaScript**.
 
+> ⚠️ The frontend is served directly by ASP.NET via `wwwroot`. No separate frontend server is required.
+
 ---
 
 ## ✨ Features
@@ -112,27 +114,24 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
 
 ## 🧩 Architecture
 
-### Backend (C# .NET)
-- **ASP.NET Core Web API** (.NET 6+)
-- **Entity Framework Core** (Code-First)
-- **SQL Server LocalDB**
-- **Swagger UI** for testing
-- Structure:
-  - `Models`
-  - `Controllers`
-  - `Data`
+### API + Frontend (ASP.NET Core)
 
----
+This project uses a **unified architecture**, where:
 
-### Frontend (Vanilla JavaScript)
-- Pure **HTML, CSS, JavaScript**
-- **Fetch API**
-- **ContentEditable API**
-- **LocalStorage** for:
-  - Theme preference
-  - JWT token storage
-- Custom `authFetch` for Bearer token handling
-- Authentication handled fully on client side
+- ASP.NET Core serves:
+  - REST API endpoints
+  - Static frontend files via `wwwroot`
+
+- Frontend is a **vanilla JavaScript SPA**
+- Authentication handled via **JWT**
+- Frontend and backend run on the **same origin**
+
+#### Structure:
+- `api/` (formerly `backend/`)
+  - `Controllers/`
+  - `Database/`
+  - `Models/`
+  - `wwwroot/` → frontend (HTML, CSS, JS)
 
 Files:
 - `auth.html` – Login/Register page
@@ -169,20 +168,13 @@ Files:
 
 ---
 
-### Running the Backend
-1. Open `backend/NotesProjectAPI.sln`
+### Running the Application
+1. Open `api/NotesProjectAPI.sln`
 2. Press **F5**
 3. Swagger opens at:  
    `https://localhost:7269/swagger`
-
----
-
-### Running the Frontend
-1. Open `frontend` in VS Code
-2. Install **Live Server**
-3. Open `auth.html` with Live Server
-4. Register or log in
-5. You will be redirected to the app
+4. Website opens at:
+   `https://localhost:7269/`
 
 ---
 
@@ -191,7 +183,7 @@ Files:
 ### Backend
 - C#
 - ASP.NET Core
-- Entity Framework Core
+- Dapper
 - SQL Server
 - Swagger
 
