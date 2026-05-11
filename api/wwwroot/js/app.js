@@ -267,6 +267,82 @@ function executeCommand(command) {
     noteContent.focus();
 }
 
+// Create clickable link
+function createLink() {
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    
+    if (!selectedText) {
+        alert('Please select some text first to turn into a link.');
+        return;
+    }
+    
+    // Prompt for URL
+    const url = prompt('Enter URL:', 'https://');
+    
+    if (url && url !== 'https://') {
+        // Ensure URL has protocol
+        const fullUrl = url.startsWith('http://') || url.startsWith('https://') 
+            ? url 
+            : 'https://' + url;
+        
+        // Create link
+        document.execCommand('createLink', false, fullUrl);
+        
+        // Make links open in new tab
+        const links = noteContent.querySelectorAll('a[href="' + fullUrl + '"]');
+        links.forEach(link => {
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+        });
+    }
+    
+    noteContent.focus();
+}
+
+// Auto-linkify URLs in text
+function autoLinkify() {
+    const content = noteContent.innerHTML;
+    
+    // Regex to match URLs
+    const urlRegex = /(https?:\/\/[^\s<>"]+)/g;
+    
+    // Replace URLs with anchor tags (but avoid double-linking)
+    const linkedContent = content.replace(urlRegex, (url) => {
+        // Check if URL is already inside an <a> tag
+        if (content.indexOf(`<a href="${url}"`) !== -1 || 
+            content.indexOf(`<a href='${url}'`) !== -1) {
+            return url; // Already linked
+        }
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
+    
+    if (linkedContent !== content) {
+        // Save cursor position
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const cursorPos = range.startOffset;
+        
+        // Update content
+        noteContent.innerHTML = linkedContent;
+        
+        // Restore cursor position (approximately)
+        try {
+            const newRange = document.createRange();
+            const textNode = noteContent.childNodes[0];
+            if (textNode) {
+                newRange.setStart(textNode, Math.min(cursorPos, textNode.length));
+                newRange.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            }
+        } catch (e) {
+            // Cursor restoration failed, just focus
+            noteContent.focus();
+        }
+    }
+}
+
 // Set font
 function setFont(font) {
     currentFont = font;
