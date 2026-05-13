@@ -83,7 +83,7 @@ Main features:
 Swagger available at:
 https://localhost:7269/swagger
 
-## 🧩 Architecture
+### 🧩 Architecture
 - ASP.NET Core Web API
 - Vanilla JavaScript frontend served via `wwwroot`
 - JWT authentication
