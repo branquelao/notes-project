@@ -77,6 +77,7 @@ const darkModeToggle = document.getElementById('darkModeToggle');
 const createLinkBtn = document.getElementById('createLinkBtn');
 const insertImageBtn = document.getElementById('insertImageBtn');
 const logoutOption = document.getElementById('logoutOption');
+const insertChecklistBtn = document.getElementById('insertChecklistBtn');
 
 // State
 let notes = [];
@@ -135,6 +136,12 @@ createLinkBtn.addEventListener('click', (e) => {
 insertImageBtn.addEventListener('click', (e) => {
     e.preventDefault();
     insertImage();
+});
+
+// Insert checklist button
+insertChecklistBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    insertChecklistItem();
 });
 
 // Handle paste images
@@ -259,6 +266,10 @@ document.addEventListener('keydown', (e) => {
                 break;
         }
     }
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        insertChecklistItem();
+    }
 });
 
 // Execute formatting command
@@ -342,6 +353,106 @@ function autoLinkify() {
         }
     }
 }
+
+// Insert checklist item
+function insertChecklistItem() {
+    // Create checklist item container
+    const item = document.createElement('div');
+    item.className = 'checklist-item';
+    
+    // Create checkbox
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.addEventListener('change', () => {
+        // Trigger auto-save when checkbox changes
+        noteContent.dispatchEvent(new Event('input'));
+    });
+    
+    // Create editable text
+    const text = document.createElement('span');
+    text.className = 'checklist-text';
+    text.contentEditable = 'true';
+    text.textContent = '';
+    
+    // Create delete button
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-item';
+    deleteBtn.textContent = '×';
+    deleteBtn.addEventListener('click', () => {
+        item.remove();
+        noteContent.dispatchEvent(new Event('input'));
+    });
+    
+    // Assemble item
+    item.appendChild(checkbox);
+    item.appendChild(text);
+    item.appendChild(deleteBtn);
+    
+    // Insert at cursor position
+    insertNodeAtCursor(item);
+    
+    // Add line break after item
+    const br = document.createElement('br');
+    insertNodeAtCursor(br);
+    
+    // Focus on the text span
+    text.focus();
+    
+    // Trigger auto-save
+    noteContent.dispatchEvent(new Event('input'));
+}
+
+function initializeChecklistItems() {
+    const checkboxes = noteContent.querySelectorAll(
+        '.checklist-item input[type="checkbox"]'
+    );
+    checkboxes.forEach(checkbox => {
+
+        checkbox.addEventListener('change', () => {
+
+            if (checkbox.checked) {
+                checkbox.setAttribute('checked', 'checked');
+            } else {
+                checkbox.removeAttribute('checked');
+            }
+
+            noteContent.dispatchEvent(new Event('input'));
+        });
+
+    });
+}
+
+// Handle Enter key in checklist items
+noteContent.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const selection = window.getSelection();
+        const node = selection.anchorNode;
+        
+        // Check if we're inside a checklist text
+        let checklistText = null;
+        if (node && node.parentElement) {
+            if (node.parentElement.classList.contains('checklist-text')) {
+                checklistText = node.parentElement;
+            } else if (node.classList && node.classList.contains('checklist-text')) {
+                checklistText = node;
+            }
+        }
+        
+        if (checklistText) {
+            e.preventDefault();
+            
+            // If text is empty, remove the checklist item
+            if (checklistText.textContent.trim() === '') {
+                const item = checklistText.closest('.checklist-item');
+                item.remove();
+                noteContent.focus();
+            } else {
+                // Create new checklist item
+                insertChecklistItem();
+            }
+        }
+    }
+});
 
 // Set font
 function setFont(font) {
@@ -483,6 +594,8 @@ async function selectNote(id) {
     noteTitle.value = stripHtml(note.title);
     noteContent.innerHTML = note.content;
     
+    initializeChecklistItems();
+
     // Update sidebar active state
     renderSidebar();
     

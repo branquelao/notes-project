@@ -590,3 +590,59 @@ body.dark-mode .note-content-input img:hover {
 body.dark-mode .note-content-input img.selected {
     outline-color: #4da6ff;
 }
+
+/* Checklist styles */
+.checklist-item {
+    display: flex;
+    align-items: flex-start;
+    margin: 8px 0;
+    padding: 4px 0;
+}
+
+.checklist-item input[type="checkbox"] {
+    margin-right: 10px;
+    margin-top: 4px;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.checklist-item .checklist-text {
+    flex: 1;
+    outline: none;
+    min-width: 0;
+    word-wrap: break-word;
+}
+
+.checklist-item .checklist-text:empty:before {
+    content: 'List item';
+    color: var(--text-secondary);
+}
+
+/* Checked items */
+.checklist-item input[type="checkbox"]:checked + .checklist-text {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+/* Delete button for checklist items */
+.checklist-item .delete-item {
+    margin-left: 8px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.checklist-item:hover .delete-item {
+    opacity: 1;
+}
+
+.checklist-item .delete-item:hover {
+    color: var(--text-primary);
+}
