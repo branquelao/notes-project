@@ -49,7 +49,7 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
 - **ContentEditable API**
 - HTML content storage for formatting preservation
 
-### 🎨 Customization
+### ⚙️ Customization
 - Dark mode
 - Font selection
 - Small text mode
