@@ -613,17 +613,21 @@ body.dark-mode .note-content-input img.selected {
     outline: none;
     min-width: 0;
     word-wrap: break-word;
+
+    color: var(--text-primary) !important;
+    caret-color: var(--text-primary);
 }
 
-.checklist-item .checklist-text:empty:before {
+/* Placeholder */
+.checklist-item .checklist-text:empty::before {
     content: 'List item';
     color: var(--text-secondary);
 }
 
-/* Checked items */
+/* Checked state */
 .checklist-item input[type="checkbox"]:checked + .checklist-text {
-    text-decoration: line-through;
     color: var(--text-secondary);
+    text-decoration: line-through;
 }
 
 /* Delete button for checklist items */
