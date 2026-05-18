@@ -650,3 +650,78 @@ body.dark-mode .note-content-input img.selected {
 .checklist-item .delete-item:hover {
     color: var(--text-primary);
 }
+
+/* Settings button */
+.sidebar-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.settings-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+    color: var(--text-primary);
+}
+
+.settings-btn:hover {
+    background: var(--bg-secondary);
+}
+
+/* Settings menu */
+.settings-menu {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 220px;
+    z-index: 1000;
+}
+
+.settings-menu.active {
+    display: block;
+}
+
+/* Toolbar spacer - pushes items to the right */
+.toolbar-spacer {
+    flex: 1;
+}
+
+/* Font and Actions menus */
+.font-menu,
+.actions-menu {
+    display: none;
+    position: absolute;
+    top: 52px;
+    right: 10px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    z-index: 1000;
+}
+
+.font-menu.active,
+.actions-menu.active {
+    display: block;
+}
+
+/* Position actions menu correctly */
+.actions-menu {
+    right: 0;
+}
+
+.font-menu {
+    right: 50px;
+}
