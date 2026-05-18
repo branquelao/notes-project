@@ -64,27 +64,35 @@ const noteTitle = document.getElementById('noteTitle');
 const noteContent = document.getElementById('noteContent');
 const newNoteBtn = document.getElementById('newNoteBtn');
 const toolbarBtns = document.querySelectorAll('.toolbar-btn');
-const menuBtn = document.getElementById('menuBtn');
-const dropdownMenu = document.getElementById('dropdownMenu');
-const fontOptions = document.querySelectorAll('.font-option');
-const smallTextToggle = document.getElementById('smallTextToggle');
+const searchInput = document.getElementById('searchInput');
+const createLinkBtn = document.getElementById('createLinkBtn');
+const insertImageBtn = document.getElementById('insertImageBtn');
+const insertChecklistBtn = document.getElementById('insertChecklistBtn');
+
+// Settings menu
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsMenu = document.getElementById('settingsMenu');
+const darkModeToggle = document.getElementById('darkModeToggle');
 const fullWidthToggle = document.getElementById('fullWidthToggle');
+const logoutOption = document.getElementById('logoutOption');
+
+// Font menu
+const fontBtn = document.getElementById('fontBtn');
+const fontMenu = document.getElementById('fontMenu');
+const fontOptions = document.querySelectorAll('.font-option');
+
+// Actions menu
+const actionsBtn = document.getElementById('actionsBtn');
+const actionsMenu = document.getElementById('actionsMenu');
 const deleteNoteOption = document.getElementById('deleteNoteOption');
 const duplicateNoteOption = document.getElementById('duplicateNoteOption');
 const exportNoteOption = document.getElementById('exportNoteOption');
-const searchInput = document.getElementById('searchInput');
-const darkModeToggle = document.getElementById('darkModeToggle');
-const createLinkBtn = document.getElementById('createLinkBtn');
-const insertImageBtn = document.getElementById('insertImageBtn');
-const logoutOption = document.getElementById('logoutOption');
-const insertChecklistBtn = document.getElementById('insertChecklistBtn');
 
 // State
 let notes = [];
 let currentNoteId = null;
 let saveTimeout = null;
 let currentFont = 'default';
-let isSmallText = false;
 let isFullWidth = false;
 let searchQuery = '';
 
@@ -163,16 +171,40 @@ noteContent.addEventListener('paste', (e) => {
     }, 100);
 });
 
-// Menu button toggle
-menuBtn.addEventListener('click', (e) => {
+// Settings button toggle
+settingsBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    dropdownMenu.classList.toggle('active');
+    settingsMenu.classList.toggle('active');
+    fontMenu.classList.remove('active');
+    actionsMenu.classList.remove('active');
 });
 
-// Close menu when clicking outside
+// Font button toggle
+fontBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fontMenu.classList.toggle('active');
+    settingsMenu.classList.remove('active');
+    actionsMenu.classList.remove('active');
+});
+
+// Actions button toggle
+actionsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    actionsMenu.classList.toggle('active');
+    settingsMenu.classList.remove('active');
+    fontMenu.classList.remove('active');
+});
+
+// Close all menus when clicking outside
 document.addEventListener('click', (e) => {
-    if (!dropdownMenu.contains(e.target) && e.target !== menuBtn) {
-        dropdownMenu.classList.remove('active');
+    if (!settingsMenu.contains(e.target) && e.target !== settingsBtn) {
+        settingsMenu.classList.remove('active');
+    }
+    if (!fontMenu.contains(e.target) && e.target !== fontBtn) {
+        fontMenu.classList.remove('active');
+    }
+    if (!actionsMenu.contains(e.target) && e.target !== actionsBtn) {
+        actionsMenu.classList.remove('active');
     }
 });
 
@@ -181,13 +213,8 @@ fontOptions.forEach(option => {
     option.addEventListener('click', () => {
         const font = option.getAttribute('data-font');
         setFont(font);
+        fontMenu.classList.remove('active');
     });
-});
-
-// Small text toggle
-smallTextToggle.addEventListener('change', () => {
-    isSmallText = smallTextToggle.checked;
-    applyTextSize();
 });
 
 // Full width toggle
@@ -204,7 +231,7 @@ darkModeToggle.addEventListener('change', () => {
 // Delete note option
 deleteNoteOption.addEventListener('click', () => {
     if (currentNoteId) {
-        dropdownMenu.classList.remove('active');
+        actionsMenu.classList.remove('active');
         deleteNote(currentNoteId, { stopPropagation: () => {} });
     }
 });
@@ -212,7 +239,7 @@ deleteNoteOption.addEventListener('click', () => {
 // Duplicate note option
 duplicateNoteOption.addEventListener('click', () => {
     if (currentNoteId) {
-        dropdownMenu.classList.remove('active');
+        actionsMenu.classList.remove('active');
         duplicateNote();
     }
 });
@@ -220,18 +247,16 @@ duplicateNoteOption.addEventListener('click', () => {
 // Export note option
 exportNoteOption.addEventListener('click', () => {
     if (currentNoteId) {
-        dropdownMenu.classList.remove('active');
+        actionsMenu.classList.remove('active');
         exportNote();
     }
 });
 
 // Logout option
-if (logoutOption) {
-    logoutOption.addEventListener('click', () => {
-        dropdownMenu.classList.remove('active');
-        logout();
-    });
-}
+logoutOption.addEventListener('click', () => {
+    settingsMenu.classList.remove('active');
+    logout();
+});
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {

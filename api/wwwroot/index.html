@@ -12,7 +12,40 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>📝 Notes Project</h2>
+                <div class="sidebar-title-row">
+                    <h2>📝 Notes Project</h2>
+                    <!-- Settings button -->
+                    <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
+                    
+                    <!-- Settings Menu -->
+                    <div class="settings-menu" id="settingsMenu">
+                        <div class="dropdown-section">
+                            <div class="dropdown-item">
+                                <span>🌙 Dark mode</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="darkModeToggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="dropdown-item">
+                                <span>↔️ Full width</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="fullWidthToggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown-divider"></div>
+                        
+                        <div class="dropdown-section">
+                            <div class="dropdown-item" id="logoutOption">
+                                <span>🚪 Logout</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <button id="newNoteBtn" class="new-note-btn">+ Create New Note</button>
 
                 <input 
@@ -20,7 +53,6 @@
                     id="searchInput" 
                     class="search-input" 
                     placeholder="Search notes...">
-                    
             </div>
             
             <div class="notes-list" id="sidebarNotesList">
@@ -35,86 +67,6 @@
             </div>
 
             <div class="editor-content" id="editorContent" style="display: none;">
-                <!-- Top Bar with Menu -->
-                <div class="editor-top-bar">
-                    <div class="editor-top-bar-left"></div>
-                    <div class="editor-top-bar-right">
-                        <button class="menu-btn" id="menuBtn">⋯</button>
-                        
-                        <!-- Dropdown Menu -->
-                        <div class="dropdown-menu" id="dropdownMenu">
-                            <div class="dropdown-section">
-                                <div class="dropdown-item">
-                                    <span>🌙 Dark mode</span>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="darkModeToggle">
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <div class="dropdown-divider"></div>
-                            
-                            <div class="dropdown-section">
-                                <div class="dropdown-item font-option" data-font="default">
-                                    <span class="font-preview" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;">Ag</span>
-                                    <span>Default</span>
-                                </div>
-                                <div class="dropdown-item font-option" data-font="serif">
-                                    <span class="font-preview" style="font-family: 'Georgia', serif;">Ag</span>
-                                    <span>Serif</span>
-                                </div>
-                                <div class="dropdown-item font-option" data-font="mono">
-                                    <span class="font-preview" style="font-family: 'Courier New', monospace;">Ag</span>
-                                    <span>Mono</span>
-                                </div>
-                            </div>
-                            
-                            <div class="dropdown-divider"></div>
-                            
-                            <div class="dropdown-section">
-                                <div class="dropdown-item">
-                                    <span>Small text</span>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="smallTextToggle">
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                <div class="dropdown-item">
-                                    <span>Full width</span>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="fullWidthToggle">
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <div class="dropdown-divider"></div>
-                            
-                            <div class="dropdown-section">
-                                <div class="dropdown-item" id="deleteNoteOption">
-                                    <span>🗑️ Delete note</span>
-                                </div>
-                                <div class="dropdown-item" id="duplicateNoteOption">
-                                    <span>📄 Duplicate</span>
-                                    <span class="shortcut">Ctrl+D</span>
-                                </div>
-                            </div>
-                            
-                            <div class="dropdown-divider"></div>
-                            
-                            <div class="dropdown-section">
-                                <div class="dropdown-item" id="exportNoteOption">
-                                    <span>⬇️ Export</span>
-                                </div>
-                                <div class="dropdown-item" id="logoutOption">
-                                    <span>🚪 Logout</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Formatting Toolbar -->
                 <div class="toolbar">
                     <button class="toolbar-btn" data-command="bold" title="Bold (Ctrl+B)">
@@ -153,6 +105,57 @@
                     <button class="toolbar-btn" data-command="removeFormat" title="Clear Formatting">
                         ✕
                     </button>
+                    
+                    <div class="toolbar-spacer"></div>
+                    
+                    <!-- Font button -->
+                    <button class="toolbar-btn" id="fontBtn" title="Font">
+                        🎨
+                    </button>
+                    
+                    <!-- Font Menu -->
+                    <div class="font-menu" id="fontMenu">
+                        <div class="dropdown-section">
+                            <div class="dropdown-item font-option" data-font="default">
+                                <span class="font-preview" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;">Ag</span>
+                                <span>Default</span>
+                            </div>
+                            <div class="dropdown-item font-option" data-font="serif">
+                                <span class="font-preview" style="font-family: 'Georgia', serif;">Ag</span>
+                                <span>Serif</span>
+                            </div>
+                            <div class="dropdown-item font-option" data-font="mono">
+                                <span class="font-preview" style="font-family: 'Courier New', monospace;">Ag</span>
+                                <span>Mono</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions button -->
+                    <button class="toolbar-btn" id="actionsBtn" title="More actions">
+                        ⋯
+                    </button>
+                    
+                    <!-- Actions Menu -->
+                    <div class="actions-menu" id="actionsMenu">
+                        <div class="dropdown-section">
+                            <div class="dropdown-item" id="duplicateNoteOption">
+                                <span>📄 Duplicate</span>
+                                <span class="shortcut">Ctrl+D</span>
+                            </div>
+                            <div class="dropdown-item" id="exportNoteOption">
+                                <span>⬇️ Export</span>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown-divider"></div>
+                        
+                        <div class="dropdown-section">
+                            <div class="dropdown-item" id="deleteNoteOption">
+                                <span>🗑️ Delete note</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <input 
