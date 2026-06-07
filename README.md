@@ -1,21 +1,21 @@
-# 📝 Notes Project
+# Notes Website Project=
 
 A **full-stack, authenticated note-taking application** inspired by **Notion**, built with **ASP.NET Core Web API** and **vanilla JavaScript**.
 
-> ⚠️ The frontend is served directly by ASP.NET via `wwwroot`. No separate frontend server is required.
+> The frontend is served directly by ASP.NET via `wwwroot`. No separate frontend server is required.
 
 ---
 
-## ✨ Features
+## Features
 
-### 🔐 Authentication
+### Authentication
 - JWT authentication
 - Login & registration UI
 - Protected routes
 - Persistent sessions via localStorage
 - Automatic bearer token handling
 
-### 📄 Note Management
+### Note Management
 - **Create notes** with title and rich-text content
 - **Auto-save** - Changes saved automatically after 1 second of inactivity
 - **Favorite notes** - Pin important notes to the top with star icon (⭐)
@@ -26,7 +26,7 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
 - **Sidebar navigation** - Notes sorted by favorites first, then last update
 - Timestamp tracking (Created at / Updated at)
 
-### ✅ Checklist Support (Work in Progress)
+### Checklist Support (Work in Progress)
 - Insert interactive checklist items
 - Persistent checkbox state after reload
 - Auto-save support for checklist changes
@@ -36,7 +36,7 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
   - `Ctrl + Shift + C` → Insert checklist item
 - Experimental implementation using `contenteditable`
 
-### ✍️ Rich Text Editor
+### Rich Text Editor
 - Formatting toolbar:
   - **Bold** (Ctrl+B)
   - *Italic* (Ctrl+I)
@@ -49,13 +49,13 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
 - **ContentEditable API**
 - HTML content storage for formatting preservation
 
-### ⚙️ Customization
+### Customization
 - Dark mode
 - Font selection
 - Small text mode
 - Full width mode
 
-### 🎨 User Interface
+### User Interface
 - Notion-inspired layout
 - Split-pane editor
 - Light and dark themes
@@ -71,7 +71,7 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
 - **Ctrl+D** – Duplicate note
 - **Ctrl+Shift+C** - Insert checklist item
 
-### 🔌 API Integration
+### API Integration
 RESTful API with JWT authentication.
 
 Main features:
@@ -83,7 +83,7 @@ Main features:
 Swagger available at:
 https://localhost:7269/swagger
 
-### 🧩 Architecture
+### Architecture
 - ASP.NET Core Web API
 - Vanilla JavaScript frontend served via `wwwroot`
 - JWT authentication
@@ -92,7 +92,7 @@ https://localhost:7269/swagger
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Visual Studio 2022+
@@ -110,7 +110,7 @@ https://localhost:7269/swagger
 
 ---
 
-## 🛠️ Technologies
+## Technologies
 
 ### Backend
 - ASP.NET Core Web API
@@ -128,9 +128,9 @@ https://localhost:7269/swagger
 
 ---
 
-## 📌 Project Status
+## Project Status
 
-🚧 In development
+In development
 
 ### Completed
 - ✅ Full CRUD API
@@ -148,7 +148,7 @@ https://localhost:7269/swagger
 - ✅ Keyboard shortcuts
 - ✅ CORS setup
 - ✅ Smart sorting
-- ✅ **User authentication with JWT (login & register UI)**
+- ✅ User authentication with JWT (login & register UI)
 
 ---
 
