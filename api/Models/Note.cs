@@ -9,5 +9,6 @@
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public bool IsFavorite { get; set; } = false;
         public int UserId { get; set; }
+        public string Font { get; set; } = "default";
     }
 }

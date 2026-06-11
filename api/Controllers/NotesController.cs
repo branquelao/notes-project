@@ -106,7 +106,8 @@ namespace NotesProjectAPI.Controllers
                     Title = @Title,
                     Content = @Content,
                     UpdatedAt = @UpdatedAt,
-                    IsFavorite = @IsFavorite
+                    IsFavorite = @IsFavorite,
+                    Font = @Font
                 WHERE Id = @Id AND UserId = @UserId";
 
             var rowsAffected = await connection.ExecuteAsync(sql, new
@@ -115,6 +116,7 @@ namespace NotesProjectAPI.Controllers
                 note.Content,
                 UpdatedAt = DateTime.UtcNow,
                 note.IsFavorite,
+                note.Font,
                 Id = id,
                 UserId = userId
             });

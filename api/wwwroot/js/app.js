@@ -650,6 +650,15 @@ function setFont(font) {
     noteContent.classList.remove('font-default', 'font-serif', 'font-mono');
     noteTitle.classList.add(`font-${font}`);
     noteContent.classList.add(`font-${font}`);
+
+    // Persist local note and save
+    if (currentNoteId !== null) {
+        const index = notes.findIndex(n => n.id === currentNoteId);
+        if (index !== -1) {
+            notes[index].font = font;
+        }
+        autoSave();  // Shoots save with debounce
+    }
 }
 
 // Apply text size
@@ -772,6 +781,9 @@ async function selectNote(id) {
     noteTitle.value = stripHtml(note.title);
     noteContent.innerHTML = note.content;
     
+    //Set the default font that is saved
+    setFont(note.font || 'default');
+
     initializeChecklistItems();
 
     // Update sidebar active state
@@ -790,7 +802,8 @@ async function createNewNote() {
     
     const newNote = {
         title: 'New note',
-        content: ''
+        content: '',
+        font: 'default'
     };
     
     try {
@@ -900,7 +913,8 @@ async function saveCurrentNote() {
         id: currentNoteId,
         title: noteTitle.value.trim() || 'New note',
         content: noteContent.innerHTML, // Save as HTML
-        isFavorite: note.isFavorite
+        isFavorite: note.isFavorite,
+        font: currentFont
     };
     
     try {
