@@ -175,6 +175,7 @@ noteContent.addEventListener('paste', (e) => {
 settingsBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     settingsMenu.classList.toggle('active');
+    settingsBtn.classList.toggle('active');
     fontMenu.classList.remove('active');
     actionsMenu.classList.remove('active');
 });
@@ -199,6 +200,7 @@ actionsBtn.addEventListener('click', (e) => {
 document.addEventListener('click', (e) => {
     if (!settingsMenu.contains(e.target) && e.target !== settingsBtn) {
         settingsMenu.classList.remove('active');
+        settingsBtn.classList.remove('active');
     }
     if (!fontMenu.contains(e.target) && e.target !== fontBtn) {
         fontMenu.classList.remove('active');
