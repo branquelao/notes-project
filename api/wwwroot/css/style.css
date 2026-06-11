@@ -672,7 +672,15 @@ body.dark-mode .note-content-input img.selected {
 }
 
 .settings-btn:hover {
-    background: var(--bg-secondary);
+    background: var(--bg-hover);
+}
+
+.settings-btn:active {
+    background: var(--bg-active);
+}
+
+.settings-btn.active {
+    background: var(--bg-active);
 }
 
 /* Settings menu */
