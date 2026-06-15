@@ -769,3 +769,54 @@ body.dark-mode .note-content-input img.selected {
 .font-menu {
     right: 50px;
 }
+
+/* === DRAG AND DROP BLOCKS === */
+.block {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    border-radius: 4px;
+}
+
+.block-handle {
+    opacity: 0;
+    cursor: grab;
+    padding: 2px 4px;
+    margin-right: 4px;
+    color: var(--text-secondary);
+    user-select: none;
+    flex-shrink: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    transition: opacity 0.15s;
+}
+
+.block:hover .block-handle {
+    opacity: 1;
+}
+
+.block-handle:active {
+    cursor: grabbing;
+}
+
+.block-content {
+    flex: 1;
+    outline: none;
+    min-width: 0;
+    word-wrap: break-word;
+    line-height: 1.6;
+    color: var(--text-primary);
+    caret-color: var(--text-primary);
+}
+
+.block.dragging {
+    opacity: 0.4;
+}
+
+.block.drag-over {
+    border-top: 2px solid #0066cc;
+}
+
+body.dark-mode .block.drag-over {
+    border-top-color: #4da6ff;
+}
