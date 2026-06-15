@@ -480,6 +480,41 @@ input:checked + .toggle-slider:before {
     font-family: 'Courier New', 'Consolas', monospace;
 }
 
+.note-content-input.font-playfair,
+.note-title-input.font-playfair {
+    font-family: 'Playfair Display', serif;
+}
+
+.note-content-input.font-lato,
+.note-title-input.font-lato {
+    font-family: 'Lato', sans-serif;
+}
+
+.note-content-input.font-opensans,
+.note-title-input.font-opensans {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.note-content-input.font-merriweather,
+.note-title-input.font-merriweather {
+    font-family: 'Merriweather', serif;
+}
+
+.note-content-input.font-roboto,
+.note-title-input.font-roboto {
+    font-family: 'Roboto', sans-serif;
+}
+
+.note-content-input.font-nunito,
+.note-title-input.font-nunito {
+    font-family: 'Nunito', sans-serif;
+}
+
+.note-content-input.font-sourcecodepro,
+.note-title-input.font-sourcecodepro {
+    font-family: 'Source Code Pro', monospace;
+}
+
 /* Small text */
 .note-content-input.small-text {
     font-size: 0.875rem;

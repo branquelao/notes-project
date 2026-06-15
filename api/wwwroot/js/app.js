@@ -648,8 +648,9 @@ function setFont(font) {
     }
     
     // Apply font to both title and content
-    noteTitle.classList.remove('font-default', 'font-serif', 'font-mono');
-    noteContent.classList.remove('font-default', 'font-serif', 'font-mono');
+    const allFonts = ['font-default','font-serif','font-mono','font-playfair','font-lato','font-opensans','font-merriweather','font-roboto','font-nunito','font-sourcecodepro'];
+    noteTitle.classList.remove(...allFonts);
+    noteContent.classList.remove(...allFonts);
     noteTitle.classList.add(`font-${font}`);
     noteContent.classList.add(`font-${font}`);
 
