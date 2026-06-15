@@ -108,7 +108,6 @@ newNoteBtn.addEventListener('click', createNewNote);
 
 // Auto-save on input (debounced)
 noteTitle.addEventListener('input', () => autoSave());
-noteContent.addEventListener('input', () => autoSave());
 
 // Handle link clicks
 noteContent.addEventListener('click', (e) => {
@@ -542,11 +541,14 @@ function initializeChecklistItems() {
 
 // Handle Enter key in checklist items
 noteContent.addEventListener('keydown', (e) => {
-
     if (e.key !== 'Enter') return;
 
     const selection = window.getSelection();
     const node = selection.anchorNode;
+    const insideChecklist = node?.parentElement?.closest('.checklist-item') ||
+                            node?.closest?.('.checklist-item');
+    if (!insideChecklist) return;
+
 
     let checklistText = null;
 
@@ -764,6 +766,150 @@ function renderSidebar() {
     });
 }
 
+// BLOCK-BASED EDITOR
+let draggedBlock = null;
+
+function createBlock(content = '') {
+    const block = document.createElement('div');
+    block.className = 'block';
+    block.innerHTML = `
+        <span class="block-handle" title="Drag to move">⠿</span>
+        <div class="block-content" contenteditable="true">${content}</div>
+    `;
+    initBlockEvents(block);
+    return block;
+}
+
+function initBlockEvents(block) {
+    const handle = block.querySelector('.block-handle');
+    const content = block.querySelector('.block-content');
+
+    // Só ativa draggable quando segurar o handle
+    handle.addEventListener('mousedown', () => {
+        block.setAttribute('draggable', 'true');
+    });
+
+    block.addEventListener('dragstart', (e) => {
+        draggedBlock = block;
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => block.classList.add('dragging'), 0);
+    });
+
+    block.addEventListener('dragend', () => {
+        draggedBlock = null;
+        block.classList.remove('dragging');
+        block.setAttribute('draggable', 'false');
+        document.querySelectorAll('.block.drag-over')
+            .forEach(b => b.classList.remove('drag-over'));
+        autoSave();
+    });
+
+    block.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (block !== draggedBlock) {
+            block.classList.add('drag-over');
+        }
+    });
+
+    block.addEventListener('dragleave', () => {
+        block.classList.remove('drag-over');
+    });
+
+    block.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedBlock && draggedBlock !== block) {
+            noteContent.insertBefore(draggedBlock, block);
+        }
+        block.classList.remove('drag-over');
+    });
+
+    // Enter → cria novo bloco abaixo
+    content.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const newBlock = createBlock('');
+            block.insertAdjacentElement('afterend', newBlock);
+            newBlock.querySelector('.block-content').focus();
+            autoSave();
+        }
+
+        // Backspace no início de bloco vazio → remove bloco
+        if (e.key === 'Backspace' && content.innerText === '') {
+            e.preventDefault();
+            const prev = block.previousElementSibling;
+            block.remove();
+            if (prev) {
+                const prevContent = prev.querySelector('.block-content');
+                if (prevContent) {
+                    prevContent.focus();
+                    // Move cursor para o fim
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(prevContent);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            }
+            autoSave();
+        }
+    });
+
+    // Auto-save ao digitar
+    content.addEventListener('input', () => autoSave());
+}
+
+// Converte HTML salvo (texto livre) em blocos
+function parseContentToBlocks(html) {
+    noteContent.innerHTML = '';
+
+    if (!html || html.trim() === '') {
+        noteContent.appendChild(createBlock(''));
+        return;
+    }
+
+    // Cria div temporário para parsear o HTML
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+
+    // Se já é formato de blocos (.block-saved), carrega direto
+    const savedBlocks = temp.querySelectorAll('.block-saved');
+    if (savedBlocks.length > 0) {
+        savedBlocks.forEach(saved => {
+            noteContent.appendChild(createBlock(saved.innerHTML));
+        });
+        return;
+    }
+
+    // Senão, converte HTML antigo: cada filho vira um bloco
+    const children = [...temp.childNodes];
+    if (children.length === 0) {
+        noteContent.appendChild(createBlock(''));
+        return;
+    }
+
+    children.forEach(node => {
+        const temp2 = document.createElement('div');
+        temp2.appendChild(node.cloneNode(true));
+        const inner = temp2.innerHTML.trim();
+        if (inner && inner !== '<br>') {
+            noteContent.appendChild(createBlock(inner));
+        }
+    });
+
+    if (noteContent.querySelectorAll('.block').length === 0) {
+        noteContent.appendChild(createBlock(''));
+    }
+}
+
+// Serializa os blocos de volta para HTML para salvar
+function serializeBlocks() {
+    const blocks = noteContent.querySelectorAll('.block-content');
+    return [...blocks]
+        .map(b => `<div class="block-saved">${b.innerHTML}</div>`)
+        .join('');
+}
+
 // Select and display a note
 async function selectNote(id) {
     // Save current note before switching
@@ -782,7 +928,7 @@ async function selectNote(id) {
     
     // Populate editor (support HTML content)
     noteTitle.value = stripHtml(note.title);
-    noteContent.innerHTML = note.content;
+    parseContentToBlocks(note.content);
     
     //Set the default font that is saved
     setFont(note.font || 'default');
@@ -915,7 +1061,7 @@ async function saveCurrentNote() {
     const updatedNote = {
         id: currentNoteId,
         title: noteTitle.value.trim() || 'New note',
-        content: noteContent.innerHTML, // Save as HTML
+        content: serializeBlocks(), // Save as HTML
         isFavorite: note.isFavorite,
         font: currentFont
     };
@@ -1143,7 +1289,7 @@ document.addEventListener('keydown', (e) => {
         if (selectedImg) {
             e.preventDefault();
             selectedImg.remove();
-            noteContent.dispatchEvent(new Event('input'));
+            autoSave();
         }
     }
 });
