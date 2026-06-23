@@ -52,10 +52,8 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
 - HTML content storage for formatting preservation
 
 ### Customization
-- Dark mode
-- Font selection (Default, Serif, Mono)
-- Small text mode
-- Full width mode
+- Toggle for Dark mode
+- Varied Font selection
 
 ### User Interface
 - Notion-inspired layout
