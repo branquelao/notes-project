@@ -73,7 +73,6 @@ const insertChecklistBtn = document.getElementById('insertChecklistBtn');
 const settingsBtn = document.getElementById('settingsBtn');
 const settingsMenu = document.getElementById('settingsMenu');
 const darkModeToggle = document.getElementById('darkModeToggle');
-const fullWidthToggle = document.getElementById('fullWidthToggle');
 const logoutOption = document.getElementById('logoutOption');
 
 // Font menu
@@ -93,7 +92,6 @@ let notes = [];
 let currentNoteId = null;
 let saveTimeout = null;
 let currentFont = 'default';
-let isFullWidth = false;
 let searchQuery = '';
 
 // Load notes when page loads
@@ -216,12 +214,6 @@ fontOptions.forEach(option => {
         setFont(font);
         fontMenu.classList.remove('active');
     });
-});
-
-// Full width toggle
-fullWidthToggle.addEventListener('change', () => {
-    isFullWidth = fullWidthToggle.checked;
-    applyWidth();
 });
 
 // Dark mode toggle
@@ -672,25 +664,6 @@ function applyTextSize() {
         noteContent.classList.add('small-text');
     } else {
         noteContent.classList.remove('small-text');
-    }
-}
-
-// Apply width
-function applyWidth() {
-    const toolbar = document.querySelector('.toolbar');
-    const topBar = document.querySelector('.editor-top-bar');
-    const titleInput = document.querySelector('.note-title-input');
-    
-    if (isFullWidth) {
-        toolbar.style.padding = '12px 48px';
-        topBar.style.padding = '12px 48px';
-        titleInput.style.margin = '20px 48px 10px 48px';
-        noteContent.style.padding = '0 48px 60px 48px';
-    } else {
-        toolbar.style.padding = '12px 96px';
-        topBar.style.padding = '12px 96px';
-        titleInput.style.margin = '20px 96px 10px 96px';
-        noteContent.style.padding = '0 96px 60px 96px';
     }
 }
 
