@@ -189,7 +189,6 @@ body {
     flex-direction: column;
     background: var(--bg-primary);
     overflow: hidden;
-    padding-top: 35px;
 }
 
 .editor-placeholder {
@@ -205,6 +204,7 @@ body {
     flex-direction: column;
     height: 100%;
     overflow-y: auto;
+    position: relative;
 }
 
 /* Editor Top Bar */
@@ -402,7 +402,7 @@ input:checked + .toggle-slider:before {
     outline: none;
     font-size: 2.5rem;
     font-weight: 700;
-    margin: 20px 96px 10px 96px;
+    margin: 150px 96px 10px 300px;
     color: var(--text-primary);
     background: transparent;
     padding: 0;
@@ -421,7 +421,7 @@ input:checked + .toggle-slider:before {
     color: var(--text-primary);
     background: transparent;
     flex: 1;
-    padding: 0 96px 60px 96px;
+    padding: 0 96px 60px 300px;
     overflow-y: auto;
     min-height: 200px;
 }
@@ -729,13 +729,13 @@ body.dark-mode .note-content-input img.selected {
 .settings-menu {
     display: none;
     position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
+    top: calc(100% + 14px);
+    left: 10;
     background: var(--bg-primary);
     border: 1px solid var(--border-primary);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    min-width: 220px;
+    min-width: 240px;
     z-index: 1000;
 }
 
@@ -754,13 +754,47 @@ body.dark-mode .note-content-input img.selected {
     display: none;
     position: absolute;
     top: 52px;
-    right: 10px;
+    right: 14px;
     background: var(--bg-primary);
     border: 1px solid var(--border-primary);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     min-width: 180px;
     z-index: 1000;
+}
+
+/* Actions Right Button */
+.actions-btn {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+
+    background: var(--bg-primary);
+    border: 1px solid var(--border-secondary);
+    border-radius: 4px;
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: all 0.15s;
+
+    color: var(--text-primary);
+    font-size: 1.2rem;
+}
+
+.actions-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-secondary);
+}
+
+.actions-btn:active,
+.actions-btn.active {
+    background: var(--bg-active);
 }
 
 .font-menu.active,
@@ -770,7 +804,7 @@ body.dark-mode .note-content-input img.selected {
 
 /* Position actions menu correctly */
 .actions-menu {
-    right: 0;
+    right: 14;
 }
 
 .font-menu {

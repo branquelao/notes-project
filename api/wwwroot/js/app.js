@@ -71,6 +71,13 @@ const settingsMenu = document.getElementById('settingsMenu');
 const darkModeToggle = document.getElementById('darkModeToggle');
 const logoutOption = document.getElementById('logoutOption');
 
+// Actions menu
+const actionsBtn = document.getElementById('actionsBtn');
+const actionsMenu = document.getElementById('actionsMenu');
+const deleteNoteOption = document.getElementById('deleteNoteOption');
+const duplicateNoteOption = document.getElementById('duplicateNoteOption');
+const exportNoteOption = document.getElementById('exportNoteOption');
+
 // Font Options
 const fontOptions = document.querySelectorAll('.font-option');
 
@@ -133,6 +140,7 @@ settingsBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     settingsMenu.classList.toggle('active');
     settingsBtn.classList.toggle('active');
+    actionsMenu.classList.remove('active');
 });
 
 // Close all menus when clicking outside
@@ -141,11 +149,46 @@ document.addEventListener('click', (e) => {
         settingsMenu.classList.remove('active');
         settingsBtn.classList.remove('active');
     }
+    if (!actionsMenu.contains(e.target) && e.target !== actionsBtn) {
+        actionsMenu.classList.remove('active');
+    }
+});
+
+// Actions button toggle
+actionsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    actionsMenu.classList.toggle('active');
+    settingsMenu.classList.remove('active');
+    fontMenu.classList.remove('active');
 });
 
 // Dark mode toggle
 darkModeToggle.addEventListener('change', () => {
     toggleDarkMode();
+});
+
+// Delete note option
+deleteNoteOption.addEventListener('click', () => {
+    if (currentNoteId) {
+        actionsMenu.classList.remove('active');
+        deleteNote(currentNoteId, { stopPropagation: () => {} });
+    }
+});
+
+// Duplicate note option
+duplicateNoteOption.addEventListener('click', () => {
+    if (currentNoteId) {
+        actionsMenu.classList.remove('active');
+        duplicateNote();
+    }
+});
+
+// Export note option
+exportNoteOption.addEventListener('click', () => {
+    if (currentNoteId) {
+        actionsMenu.classList.remove('active');
+        exportNote();
+    }
 });
 
 // Logout option
