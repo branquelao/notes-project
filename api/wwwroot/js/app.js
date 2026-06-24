@@ -104,6 +104,28 @@ newNoteBtn.addEventListener('click', createNewNote);
 // Auto-save on input (debounced)
 noteTitle.addEventListener('input', () => autoSave());
 
+noteTitle.addEventListener('keydown', (e) => {
+
+    const atEnd =
+        noteTitle.selectionStart ===
+        noteTitle.value.length;
+
+    if (
+        e.key === 'Enter' ||
+        e.key === 'ArrowDown' ||
+        (e.key === 'ArrowRight' && atEnd)
+    ) {
+        e.preventDefault();
+
+        const firstBlock =
+            noteContent.querySelector('.block-content');
+
+        if (firstBlock) {
+            moveCursorToStart(firstBlock);
+        }
+    }
+});
+
 // Handle link clicks
 noteContent.addEventListener('click', (e) => {
     if (e.target.tagName === 'A') {
@@ -132,7 +154,7 @@ noteContent.addEventListener('paste', (e) => {
         }
     }
     
-    // Auto-linkify URLs (código existente)
+    // Auto-linkify URLs (existent code)
     setTimeout(() => {
         autoLinkify();
     }, 100);
@@ -709,11 +731,67 @@ function createBlock(content = '') {
     return block;
 }
 
+function moveCursorToStart(element) {
+    element.focus();
+
+    const range = document.createRange();
+    const sel = window.getSelection();
+
+    range.selectNodeContents(element);
+    range.collapse(true);
+
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
+function moveCursorToEnd(element) {
+    element.focus();
+
+    const range = document.createRange();
+    const sel = window.getSelection();
+
+    range.selectNodeContents(element);
+    range.collapse(false);
+
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
+function isCursorAtStart(element) {
+    const sel = window.getSelection();
+
+    if (!sel.rangeCount) return false;
+
+    const range = sel.getRangeAt(0);
+
+    return (
+        range.collapsed &&
+        range.startContainer.textContent !== null &&
+        range.startOffset === 0
+    );
+}
+
+function isCursorAtEnd(element) {
+    const sel = window.getSelection();
+
+    if (!sel.rangeCount) return false;
+
+    const range = sel.getRangeAt(0);
+
+    const text =
+        range.startContainer.textContent || '';
+
+    return (
+        range.collapsed &&
+        range.startOffset === text.length
+    );
+}
+
 function initBlockEvents(block) {
     const handle = block.querySelector('.block-handle');
     const content = block.querySelector('.block-content');
 
-    // Só ativa draggable quando segurar o handle
+    // Only activates draggable when holding the handle
     handle.addEventListener('mousedown', () => {
         block.setAttribute('draggable', 'true');
     });
@@ -752,7 +830,7 @@ function initBlockEvents(block) {
         block.classList.remove('drag-over');
     });
 
-    // Enter → cria novo bloco abaixo
+    // Enter creates a new block
     content.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -762,33 +840,96 @@ function initBlockEvents(block) {
             autoSave();
         }
 
-        // Backspace no início de bloco vazio → remove bloco
-        if (e.key === 'Backspace' && content.innerText === '') {
+        // Backspace at the start of an empty block removes it
+        if (e.key === 'Backspace' && content.innerText.trim() === '') {
+
+            const isFirstBlock = !block.previousElementSibling;
+
+            // If first block, goes to title
+            if (isFirstBlock) {
+                e.preventDefault();
+
+                noteTitle.focus();
+
+                const length = noteTitle.value.length;
+                noteTitle.setSelectionRange(length, length);
+
+                return;
+            }
+
+            // If isnt first block, removes normally
             e.preventDefault();
+
             const prev = block.previousElementSibling;
             block.remove();
+
             if (prev) {
                 const prevContent = prev.querySelector('.block-content');
+
                 if (prevContent) {
                     prevContent.focus();
-                    // Move cursor para o fim
+
                     const range = document.createRange();
                     const sel = window.getSelection();
+
                     range.selectNodeContents(prevContent);
                     range.collapse(false);
+
                     sel.removeAllRanges();
                     sel.addRange(range);
                 }
             }
+
             autoSave();
+        }
+
+        // UP and LEFT = goes up
+        if (
+            (e.key === 'ArrowUp' || e.key === 'ArrowLeft') &&
+            isCursorAtStart(content)
+        ) {
+            e.preventDefault();
+
+            const prev = block.previousElementSibling;
+
+            if (!prev) {
+                noteTitle.focus();
+                return;
+            }
+
+            const prevContent =
+                prev.querySelector('.block-content');
+
+            if (prevContent) {
+                moveCursorToEnd(prevContent);
+            }
+        }
+
+        // DOWN and RIGHT = goes down
+        if (
+            (e.key === 'ArrowDown' || e.key === 'ArrowRight') &&
+            isCursorAtEnd(content)
+        ) {
+            const next = block.nextElementSibling;
+
+            if (next) {
+                e.preventDefault();
+
+                const nextContent =
+                    next.querySelector('.block-content');
+
+                if (nextContent) {
+                    moveCursorToStart(nextContent);
+                }
+            }
         }
     });
 
-    // Auto-save ao digitar
+    // Auto-saves when typing
     content.addEventListener('input', () => autoSave());
 }
 
-// Converte HTML salvo (texto livre) em blocos
+// Converts saved HTML (free text) in blocks
 function parseContentToBlocks(html) {
     noteContent.innerHTML = '';
 
@@ -797,11 +938,11 @@ function parseContentToBlocks(html) {
         return;
     }
 
-    // Cria div temporário para parsear o HTML
+    // Creates temporary div to parse HTML
     const temp = document.createElement('div');
     temp.innerHTML = html;
 
-    // Se já é formato de blocos (.block-saved), carrega direto
+    // Already is block format (.block-saved), loads instantly
     const savedBlocks = temp.querySelectorAll('.block-saved');
     if (savedBlocks.length > 0) {
         savedBlocks.forEach(saved => {
@@ -810,7 +951,7 @@ function parseContentToBlocks(html) {
         return;
     }
 
-    // Senão, converte HTML antigo: cada filho vira um bloco
+    // If not, converts old HTML: each son turns into a block
     const children = [...temp.childNodes];
     if (children.length === 0) {
         noteContent.appendChild(createBlock(''));
@@ -831,7 +972,7 @@ function parseContentToBlocks(html) {
     }
 }
 
-// Serializa os blocos de volta para HTML para salvar
+// Serializes blocks back to HTML to save
 function serializeBlocks() {
     const blocks = noteContent.querySelectorAll('.block-content');
     return [...blocks]
@@ -1201,7 +1342,7 @@ function insertNodeAtCursor(node) {
 
 // Handle image clicks (optional - for future features like delete/resize)
 noteContent.addEventListener('click', (e) => {
-    // Handle link clicks (código existente)
+    // Handle link clicks (existent code)
     if (e.target.tagName === 'A') {
         e.preventDefault();
         window.open(e.target.href, '_blank');
