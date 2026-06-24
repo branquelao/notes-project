@@ -231,6 +231,19 @@ logoutOption.addEventListener('click', () => {
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
+    const keys = [
+        'ArrowUp',
+        'ArrowDown',
+        'ArrowLeft',
+        'ArrowRight',
+        'Enter',
+        'Backspace'
+    ];
+
+    if (keys.includes(e.key)) {
+        document.body.classList.add('keyboard-navigation');
+    }
+
     // Only work when editor is visible
     if (editorContent.style.display === 'none') return;
     
@@ -266,6 +279,10 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         insertChecklistItem();
     }
+});
+
+document.addEventListener('mousemove', () => {
+    document.body.classList.remove('keyboard-navigation');
 });
 
 // Execute formatting command

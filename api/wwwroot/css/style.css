@@ -874,3 +874,7 @@ body.dark-mode .note-content-input img.selected {
 body.dark-mode .block.drag-over {
     border-top-color: #4da6ff;
 }
+
+body.keyboard-navigation .block:hover .block-handle {
+    opacity: 0;
+}
