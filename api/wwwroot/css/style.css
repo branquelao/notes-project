@@ -189,6 +189,7 @@ body {
     flex-direction: column;
     background: var(--bg-primary);
     overflow: hidden;
+    padding-top: 35px;
 }
 
 .editor-placeholder {

@@ -63,11 +63,7 @@ const editorContent = document.getElementById('editorContent');
 const noteTitle = document.getElementById('noteTitle');
 const noteContent = document.getElementById('noteContent');
 const newNoteBtn = document.getElementById('newNoteBtn');
-const toolbarBtns = document.querySelectorAll('.toolbar-btn');
 const searchInput = document.getElementById('searchInput');
-const createLinkBtn = document.getElementById('createLinkBtn');
-const insertImageBtn = document.getElementById('insertImageBtn');
-const insertChecklistBtn = document.getElementById('insertChecklistBtn');
 
 // Settings menu
 const settingsBtn = document.getElementById('settingsBtn');
@@ -75,17 +71,8 @@ const settingsMenu = document.getElementById('settingsMenu');
 const darkModeToggle = document.getElementById('darkModeToggle');
 const logoutOption = document.getElementById('logoutOption');
 
-// Font menu
-const fontBtn = document.getElementById('fontBtn');
-const fontMenu = document.getElementById('fontMenu');
+// Font Options
 const fontOptions = document.querySelectorAll('.font-option');
-
-// Actions menu
-const actionsBtn = document.getElementById('actionsBtn');
-const actionsMenu = document.getElementById('actionsMenu');
-const deleteNoteOption = document.getElementById('deleteNoteOption');
-const duplicateNoteOption = document.getElementById('duplicateNoteOption');
-const exportNoteOption = document.getElementById('exportNoteOption');
 
 // State
 let notes = [];
@@ -122,33 +109,6 @@ noteContent.addEventListener('paste', (e) => {
     }, 100);
 });
 
-// Toolbar buttons
-toolbarBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const command = btn.getAttribute('data-command');
-        executeCommand(command);
-    });
-});
-
-// Create link button
-createLinkBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    createLink();
-});
-
-// Insert image button
-insertImageBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    insertImage();
-});
-
-// Insert checklist button
-insertChecklistBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    toggleChecklist();
-});
-
 // Handle paste images
 noteContent.addEventListener('paste', (e) => {
     const items = e.clipboardData.items;
@@ -173,24 +133,6 @@ settingsBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     settingsMenu.classList.toggle('active');
     settingsBtn.classList.toggle('active');
-    fontMenu.classList.remove('active');
-    actionsMenu.classList.remove('active');
-});
-
-// Font button toggle
-fontBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    fontMenu.classList.toggle('active');
-    settingsMenu.classList.remove('active');
-    actionsMenu.classList.remove('active');
-});
-
-// Actions button toggle
-actionsBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    actionsMenu.classList.toggle('active');
-    settingsMenu.classList.remove('active');
-    fontMenu.classList.remove('active');
 });
 
 // Close all menus when clicking outside
@@ -199,50 +141,11 @@ document.addEventListener('click', (e) => {
         settingsMenu.classList.remove('active');
         settingsBtn.classList.remove('active');
     }
-    if (!fontMenu.contains(e.target) && e.target !== fontBtn) {
-        fontMenu.classList.remove('active');
-    }
-    if (!actionsMenu.contains(e.target) && e.target !== actionsBtn) {
-        actionsMenu.classList.remove('active');
-    }
-});
-
-// Font options
-fontOptions.forEach(option => {
-    option.addEventListener('click', () => {
-        const font = option.getAttribute('data-font');
-        setFont(font);
-        fontMenu.classList.remove('active');
-    });
 });
 
 // Dark mode toggle
 darkModeToggle.addEventListener('change', () => {
     toggleDarkMode();
-});
-
-// Delete note option
-deleteNoteOption.addEventListener('click', () => {
-    if (currentNoteId) {
-        actionsMenu.classList.remove('active');
-        deleteNote(currentNoteId, { stopPropagation: () => {} });
-    }
-});
-
-// Duplicate note option
-duplicateNoteOption.addEventListener('click', () => {
-    if (currentNoteId) {
-        actionsMenu.classList.remove('active');
-        duplicateNote();
-    }
-});
-
-// Export note option
-exportNoteOption.addEventListener('click', () => {
-    if (currentNoteId) {
-        actionsMenu.classList.remove('active');
-        exportNote();
-    }
 });
 
 // Logout option
