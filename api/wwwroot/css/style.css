@@ -692,8 +692,14 @@ body.dark-mode .note-content-input img.selected {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     margin-bottom: 16px;
     position: relative;
+}
+
+.sidebar-title-row h2 {
+    margin: 0;
+    flex: 1;
 }
 
 .settings-btn {
