@@ -81,6 +81,9 @@ const exportNoteOption = document.getElementById('exportNoteOption');
 // Font Options
 const fontOptions = document.querySelectorAll('.font-option');
 
+//Favorite Button
+const favoriteBtn = document.getElementById('favoriteBtn');
+
 // State
 let notes = [];
 let currentNoteId = null;
@@ -165,6 +168,13 @@ actionsBtn.addEventListener('click', (e) => {
 // Dark mode toggle
 darkModeToggle.addEventListener('change', () => {
     toggleDarkMode();
+});
+
+// Favorite button toggle
+favoriteBtn.addEventListener('click', async () => {
+    if (currentNoteId === null) return;
+
+    await toggleFavorite(currentNoteId);
 });
 
 // Delete note option
@@ -672,8 +682,8 @@ function renderSidebar() {
                 <div class="note-item-title">${escapeHtml(plainTitle)}</div>
             </div>
             <div class="note-item-actions">
-                <button class="note-item-favorite ${note.isFavorite ? 'active' : ''}" onclick="toggleFavorite(${note.id}, event)">
-                    ${note.isFavorite ? '⭐' : '☆'}
+                <button class="note-item-favorite ${note.isFavorite ? 'active' : ''}">
+                    ${note.isFavorite ? '⭐' : ''}
                 </button>
                 <button class="note-item-delete" onclick="deleteNote(${note.id}, event)">×</button>
             </div>
@@ -857,6 +867,9 @@ async function selectNote(id) {
     // Update sidebar active state
     renderSidebar();
     
+    // Update button if active
+    updateFavoriteButton();
+
     // Focus on content
     noteContent.focus();
 }
@@ -1007,9 +1020,28 @@ async function saveCurrentNote() {
     }
 }
 
+//Update the favorite top button
+function updateFavoriteButton() {
+    if (currentNoteId === null) {
+        favoriteBtn.textContent = '☆';
+        return;
+    }
+
+    const note = notes.find(n => n.id === currentNoteId);
+
+    if (!note) {
+        favoriteBtn.textContent = '☆';
+        return;
+    }
+
+    favoriteBtn.textContent = note.isFavorite ? '⭐' : '☆';
+}
+
 // Toggle favorite status
-async function toggleFavorite(id, event) {
-    event.stopPropagation(); // Prevent note selection
+async function toggleFavorite(id, event = null) {
+    if(event){
+        event.stopPropagation(); // Prevent note selection    
+    }
     
     try {
         const response = await authFetch(`${API_URL}/${id}/favorite`, {
@@ -1032,6 +1064,7 @@ async function toggleFavorite(id, event) {
                 });
                 
                 renderSidebar();
+                updateFavoriteButton();
             }
         }
     } catch (error) {
