@@ -68,7 +68,7 @@ body {
 }
 
 .sidebar-header {
-    padding: 20px;
+    padding: 10px;
     border-bottom: 1px solid var(--border-primary);
 }
 
@@ -402,7 +402,7 @@ input:checked + .toggle-slider:before {
     outline: none;
     font-size: 2.5rem;
     font-weight: 700;
-    margin: 150px 96px 10px 300px;
+    margin: 150px 96px 10px 275px;
     color: var(--text-primary);
     background: transparent;
     padding: 0;
@@ -421,7 +421,7 @@ input:checked + .toggle-slider:before {
     color: var(--text-primary);
     background: transparent;
     flex: 1;
-    padding: 0 96px 60px 300px;
+    padding: 0 96px 60px 250px;
     overflow-y: auto;
     min-height: 200px;
 }
@@ -735,7 +735,7 @@ body.dark-mode .note-content-input img.selected {
     border: 1px solid var(--border-primary);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    min-width: 240px;
+    min-width: 260px;
     z-index: 1000;
 }
 
@@ -763,9 +763,22 @@ body.dark-mode .note-content-input img.selected {
     z-index: 1000;
 }
 
-/* Actions Right Button */
-.actions-btn {
+
+.note-actions {
     position: absolute;
+    top: 12px;
+    right: 20px;
+
+    display: flex;
+    gap: 8px;
+
+    z-index: 100;
+}
+
+/* Actions Right Button */
+
+.actions-btn {
+    position: static;
     top: 10px;
     right: 14px;
 
