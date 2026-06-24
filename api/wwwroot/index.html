@@ -60,8 +60,34 @@
             <div class="editor-placeholder" id="editorPlaceholder">
                 <h2>Select a note or create a new one</h2>
             </div>
-
+            
+            <!-- Actions Menu -->
+            <div class="actions-menu" id="actionsMenu">
+                    <div class="dropdown-section">
+                        <div class="dropdown-item" id="duplicateNoteOption">
+                            <span>📄 Duplicate</span>
+                            <span class="shortcut">Ctrl+D</span>
+                        </div>
+                        <div class="dropdown-item" id="exportNoteOption">
+                                <span>⬇️ Export</span>
+                        </div>
+                    </div>
+                        
+                    <div class="dropdown-divider"></div>
+                        
+                    <div class="dropdown-section">
+                        <div class="dropdown-item" id="deleteNoteOption">
+                            <span>🗑️ Delete note</span>
+                     </div>
+                </div>
+            </div>
+            
             <div class="editor-content" id="editorContent" style="display: none;">
+                <!-- Actions button -->
+                <button class="actions-btn" id="actionsBtn" title="More actions">
+                     ⋯
+                </button>
+
                 <input 
                     type="text" 
                     id="noteTitle" 
