@@ -53,7 +53,7 @@
             <div class="notes-list" id="sidebarNotesList">
                 <!-- Notes list will appear here -->
             </div>
-        </aside>
+        </aside>    
 
         <!-- Main Editor Area -->
         <main class="editor-container">
@@ -62,138 +62,12 @@
             </div>
 
             <div class="editor-content" id="editorContent" style="display: none;">
-                <!-- Formatting Toolbar -->
-                <div class="toolbar">
-                    <button class="toolbar-btn" data-command="bold" title="Bold (Ctrl+B)">
-                        <strong>B</strong>
-                    </button>
-                    <button class="toolbar-btn" data-command="italic" title="Italic (Ctrl+I)">
-                        <em>I</em>
-                    </button>
-                    <button class="toolbar-btn" data-command="underline" title="Underline (Ctrl+U)">
-                        <u>U</u>
-                    </button>
-                    <button class="toolbar-btn" data-command="strikeThrough" title="Strikethrough">
-                        <s>S</s>
-                    </button>
-                    <button class="toolbar-btn" id="createLinkBtn" title="Insert Link">
-                        🔗
-                    </button>
-                    <button class="toolbar-btn" id="insertImageBtn" title="Insert Image">
-                        🖼️
-                    </button>
-                
-                    <div class="toolbar-separator"></div>
-                    
-                    <button class="toolbar-btn" data-command="insertUnorderedList" title="Bullet List">
-                        ☰
-                    </button>
-                    <button class="toolbar-btn" data-command="insertOrderedList" title="Numbered List">
-                        ≡
-                    </button>
-                    <button class="toolbar-btn" id="insertChecklistBtn" title="Checklist">
-                        ☑
-                    </button>
-                    
-                    <div class="toolbar-separator"></div>
-                    
-                    <button class="toolbar-btn" data-command="removeFormat" title="Clear Formatting">
-                        ✕
-                    </button>
-                    
-                    <div class="toolbar-spacer"></div>
-                    
-                    <!-- Font button -->
-                    <button class="toolbar-btn" id="fontBtn" title="Font">
-                        🎨
-                    </button>
-                    
-                    <!-- Font Menu -->
-                    <div class="font-menu" id="fontMenu">
-                        <div class="dropdown-section">
-                            <div class="dropdown-item font-option" data-font="default">
-                                <span class="font-preview" style="font-family: -apple-system, sans-serif;">Ag</span>
-                                <span>Default (Sans)</span>
-                            </div>
-                            <div class="dropdown-item font-option" data-font="roboto">
-                                <span class="font-preview" style="font-family: 'Roboto', sans-serif;">Ag</span>
-                                <span>Roboto</span>
-                            </div>
-                            <div class="dropdown-item font-option" data-font="lato">
-                                <span class="font-preview" style="font-family: 'Lato', sans-serif;">Ag</span>
-                                <span>Lato</span>
-                            </div>
-                            <div class="dropdown-item font-option" data-font="opensans">
-                                <span class="font-preview" style="font-family: 'Open Sans', sans-serif;">Ag</span>
-                                <span>Open Sans</span>
-                            </div>
-                            <div class="dropdown-item font-option" data-font="nunito">
-                                <span class="font-preview" style="font-family: 'Nunito', sans-serif;">Ag</span>
-                                <span>Nunito</span>
-                            </div>
-
-                            <div class="dropdown-divider"></div>
-
-                            <div class="dropdown-item font-option" data-font="serif">
-                                <span class="font-preview" style="font-family: Georgia, serif;">Ag</span>
-                                <span>Serif (Georgia)</span>
-                            </div>
-                            <div class="dropdown-item font-option" data-font="playfair">
-                                <span class="font-preview" style="font-family: 'Playfair Display', serif;">Ag</span>
-                                <span>Playfair Display</span>
-                            </div>
-                            <div class="dropdown-item font-option" data-font="merriweather">
-                                <span class="font-preview" style="font-family: 'Merriweather', serif;">Ag</span>
-                                <span>Merriweather</span>
-                            </div>
-
-                            <div class="dropdown-divider"></div>
-
-                            <div class="dropdown-item font-option" data-font="mono">
-                                <span class="font-preview" style="font-family: 'Courier New', monospace;">Ag</span>
-                                <span>Mono (Courier)</span>
-                            </div>
-                            <div class="dropdown-item font-option" data-font="sourcecodepro">
-                                <span class="font-preview" style="font-family: 'Source Code Pro', monospace;">Ag</span>
-                                <span>Source Code Pro</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Actions button -->
-                    <button class="toolbar-btn" id="actionsBtn" title="More actions">
-                        ⋯
-                    </button>
-                    
-                    <!-- Actions Menu -->
-                    <div class="actions-menu" id="actionsMenu">
-                        <div class="dropdown-section">
-                            <div class="dropdown-item" id="duplicateNoteOption">
-                                <span>📄 Duplicate</span>
-                                <span class="shortcut">Ctrl+D</span>
-                            </div>
-                            <div class="dropdown-item" id="exportNoteOption">
-                                <span>⬇️ Export</span>
-                            </div>
-                        </div>
-                        
-                        <div class="dropdown-divider"></div>
-                        
-                        <div class="dropdown-section">
-                            <div class="dropdown-item" id="deleteNoteOption">
-                                <span>🗑️ Delete note</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <input 
                     type="text" 
                     id="noteTitle" 
                     class="note-title-input" 
                     placeholder="Untitled"
                 >
-                
                 <div 
                     id="noteContent" 
                     class="note-content-input"
