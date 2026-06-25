@@ -26,28 +26,17 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
 - **Sidebar navigation** - Notes sorted by favorites first, then last update
 - Timestamp tracking (Created at / Updated at)
 
-### Checklist Support (Work in Progress)
-- Insert interactive checklist items
-- Persistent checkbox state after reload
-- Auto-save support for checklist changes
-- Create new checklist item with `Enter`
-- Remove empty checklist item with `Enter` on an empty item
-- Keyboard shortcut:
-  - `Ctrl + Shift + C` → Insert checklist item
-- Experimental implementation using `contenteditable`
-
-### Rich Text Editor
-- Formatting toolbar:
-  - **Bold** (Ctrl+B)
-  - *Italic* (Ctrl+I)
-  - Underline (Ctrl+U)
-  - ~~Strikethrough~~
-  - Bullet lists
-  - Numbered lists
-  - Interactive checklists *(WIP)*
-  - Insert links (manual selection + auto-linkify on paste)
-  - Insert images (file picker or paste from clipboard)
-  - Clear formatting
+### Rich Text Editor  
+- Block-based editing experience
+- Per-block actions menu
+- Block types:
+  - Text
+  - Bulleted List
+  - Numbered List
+  - To-do List
+- Notion-style keyboard behavior:
+  - `Enter` creates a new block of the same type
+  - `Enter` on an empty list item exits the list
 - **ContentEditable API**
 - HTML content storage for formatting preservation
 
@@ -61,15 +50,6 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
 - Light and dark themes
 - Inline note actions
 - Responsive interactions
-
-### Keyboard Shortcuts
-- **Ctrl+N** – New note
-- **Ctrl+S** – Save note
-- **Ctrl+B** – Bold
-- **Ctrl+I** – Italic
-- **Ctrl+U** – Underline
-- **Ctrl+D** – Duplicate note
-- **Ctrl+Shift+C** – Insert checklist item
 
 ### API Integration
 RESTful API with JWT authentication.
@@ -139,17 +119,17 @@ In development
 - ✅ Auto-save
 - ✅ Search
 - ✅ Favorites
-- ✅ Dark mode
-- ✅ Font customization
-- ✅ Layout customization
+- ✅ Dark mod
 - ✅ Note duplication
 - ✅ Export notes
-- ✅ Keyboard shortcuts
 - ✅ CORS setup
 - ✅ Smart sorting
 - ✅ User authentication with JWT (login & register UI)
-- ✅ Image insertion (file picker and clipboard paste)
-- ✅ Link insertion with auto-linkify
+- ✅ Block-based editor architecture
+- ✅ Bulleted List blocks
+- ✅ Numbered List blocks
+- ✅ To-do List blocks
+- ✅ Notion-style Enter behavior
 
 ---
 
@@ -157,8 +137,5 @@ In development
 - 🔲 Categories/folders
 - 🔲 Tags system
 - 🔲 Image uploads (server-side)
-- 🔲 Mobile responsiveness
-- 🔲 Better checklist UX
-- 🔲 Drag-and-drop blocks
+- 🔲 Persist block types and checklist state
 - 🔲 Slash commands (/todo, /image, /heading)
-- 🔲 Block-based editor architecture
