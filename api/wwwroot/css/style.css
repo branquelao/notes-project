@@ -832,6 +832,11 @@ body.dark-mode .note-content-input img.selected {
     border-radius: 4px;
 }
 
+.block-prefix {
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
 .block-handle {
     opacity: 0;
     cursor: grab;
@@ -891,4 +896,10 @@ body.keyboard-navigation .block:hover .block-handle {
 
 .block-menu.active {
     display: block;
+}
+
+.todo-checkbox {
+    margin-right: 8px;
+    align-self: center;
+    flex-shrink: 0;
 }
