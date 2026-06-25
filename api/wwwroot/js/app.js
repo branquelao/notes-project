@@ -78,6 +78,10 @@ const deleteNoteOption = document.getElementById('deleteNoteOption');
 const duplicateNoteOption = document.getElementById('duplicateNoteOption');
 const exportNoteOption = document.getElementById('exportNoteOption');
 
+// Block menu (per-line)
+const blockMenu = document.getElementById('blockMenu');
+let activeBlockMenuTarget = null;
+
 // Font Options
 const fontOptions = document.querySelectorAll('.font-option');
 
@@ -177,6 +181,9 @@ document.addEventListener('click', (e) => {
     if (!actionsMenu.contains(e.target) && e.target !== actionsBtn) {
         actionsMenu.classList.remove('active');
     }
+    if (!blockMenu.contains(e.target) && !e.target.classList.contains('block-handle')) {
+        closeBlockMenu();
+    }
 });
 
 // Actions button toggle
@@ -184,7 +191,6 @@ actionsBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     actionsMenu.classList.toggle('active');
     settingsMenu.classList.remove('active');
-    fontMenu.classList.remove('active');
 });
 
 // Dark mode toggle
@@ -813,6 +819,17 @@ function initBlockEvents(block) {
         block.setAttribute('draggable', 'true');
     });
 
+    // Opens/closes the per-block menu
+    handle.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        if (blockMenu.classList.contains('active') && activeBlockMenuTarget === block) {
+            closeBlockMenu();
+        } else {
+            openBlockMenu(handle, block);
+        }
+    });
+
     block.addEventListener('dragstart', (e) => {
         draggedBlock = block;
         e.dataTransfer.effectAllowed = 'move';
@@ -944,6 +961,23 @@ function initBlockEvents(block) {
 
     // Auto-saves when typing
     content.addEventListener('input', () => autoSave());
+}
+
+function openBlockMenu(handle, block) {
+    console.log('OPEN MENU');
+
+    activeBlockMenuTarget = block;
+
+    const rect = handle.getBoundingClientRect();
+    blockMenu.style.top = `${rect.top - 43}px`;
+    blockMenu.style.left = `${rect.left - 220}px`;
+
+    blockMenu.classList.add('active');
+}
+
+function closeBlockMenu() {
+    blockMenu.classList.remove('active');
+    activeBlockMenuTarget = null;
 }
 
 // Converts saved HTML (free text) in blocks

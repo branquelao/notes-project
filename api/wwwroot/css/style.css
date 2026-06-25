@@ -878,3 +878,17 @@ body.dark-mode .block.drag-over {
 body.keyboard-navigation .block:hover .block-handle {
     opacity: 0;
 }
+
+/* Block Menu (per-line) */
+.block-menu {
+    position: fixed;
+    top: auto;
+    right: auto;
+    left: 30px;
+    width: 220px;
+    display: none;
+}
+
+.block-menu.active {
+    display: block;
+}
