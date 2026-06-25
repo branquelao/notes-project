@@ -81,6 +81,12 @@ const exportNoteOption = document.getElementById('exportNoteOption');
 // Block menu (per-line)
 const blockMenu = document.getElementById('blockMenu');
 let activeBlockMenuTarget = null;
+const blockBulletedList =
+    document.getElementById('blockBulletedList');
+const blockNumberedList =
+    document.getElementById('blockNumberedList');
+const blockChecklist =
+    document.getElementById('blockChecklist');
 
 // Font Options
 const fontOptions = document.querySelectorAll('.font-option');
@@ -281,10 +287,6 @@ document.addEventListener('keydown', (e) => {
                 break;
         }
     }
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
-        e.preventDefault();
-        insertChecklistItem();
-    }
 });
 
 document.addEventListener('mousemove', () => {
@@ -372,262 +374,6 @@ function autoLinkify() {
         }
     }
 }
-
-// Insert checklist item
-function insertChecklistItem() {
-    // Create checklist item container
-    const item = document.createElement('div');
-    item.className = 'checklist-item';
-
-    // Checkbox
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-
-    checkbox.addEventListener('change', () => {
-        if (checkbox.checked) {
-            checkbox.setAttribute('checked', 'checked');
-        } else {
-            checkbox.removeAttribute('checked');
-        }
-
-        noteContent.dispatchEvent(new Event('input'));
-    });
-
-    // Editable text
-    const text = document.createElement('span');
-    text.className = 'checklist-text';
-    text.contentEditable = 'true';
-
-    // Important:
-    // Prevent weird "list item" behavior
-    text.innerHTML = '';
-
-    // Assemble
-    item.appendChild(checkbox);
-    item.appendChild(text);
-
-    // Insert item
-    insertNodeAtCursor(item);
-
-    // Place cursor INSIDE checklist text
-    const range = document.createRange();
-    const selection = window.getSelection();
-
-    range.selectNodeContents(text);
-    range.collapse(true);
-
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    text.focus();
-
-    // Auto-save
-    noteContent.dispatchEvent(new Event('input'));
-}
-
-function toggleChecklist() {
-    const selection = window.getSelection();
-
-    if (!selection.rangeCount) return;
-
-    let node = selection.anchorNode;
-
-    // Normalize text node
-    if (node.nodeType === Node.TEXT_NODE) {
-        node = node.parentElement;
-    }
-
-    // Check if already inside checklist
-    const existingChecklist = node.closest('.checklist-item');
-
-    // REMOVE checklist
-    if (existingChecklist) {
-
-        const textElement =
-            existingChecklist.querySelector('.checklist-text');
-
-        const textContent = textElement.innerHTML;
-
-        // Create plain text node
-        const plainText = document.createElement('span');
-        plainText.innerHTML = textContent || '';
-
-        // Replace checklist with plain text
-        existingChecklist.replaceWith(plainText);
-
-        // Restore cursor
-        const range = document.createRange();
-
-        range.selectNodeContents(plainText);
-        range.collapse(false);
-
-        selection.removeAllRanges();
-        selection.addRange(range);
-
-        noteContent.focus();
-
-        noteContent.dispatchEvent(new Event('input'));
-
-        return;
-    }
-
-    // CREATE checklist
-    const item = document.createElement('div');
-    item.className = 'checklist-item';
-
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-
-    checkbox.addEventListener('change', () => {
-
-        if (checkbox.checked) {
-            checkbox.setAttribute('checked', 'checked');
-        } else {
-            checkbox.removeAttribute('checked');
-        }
-
-        noteContent.dispatchEvent(new Event('input'));
-    });
-
-    const text = document.createElement('span');
-    text.className = 'checklist-text';
-    text.contentEditable = 'true';
-
-    item.appendChild(checkbox);
-    item.appendChild(text);
-
-    insertNodeAtCursor(item);
-
-    // Focus inside text
-    const range = document.createRange();
-
-    range.selectNodeContents(text);
-    range.collapse(true);
-
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    text.focus();
-
-    noteContent.dispatchEvent(new Event('input'));
-}
-
-function initializeChecklistItems() {
-    const checkboxes = noteContent.querySelectorAll(
-        '.checklist-item input[type="checkbox"]'
-    );
-    checkboxes.forEach(checkbox => {
-
-        checkbox.addEventListener('change', () => {
-
-            if (checkbox.checked) {
-                checkbox.setAttribute('checked', 'checked');
-            } else {
-                checkbox.removeAttribute('checked');
-            }
-
-            noteContent.dispatchEvent(new Event('input'));
-        });
-
-    });
-}
-
-// Handle Enter key in checklist items
-noteContent.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter') return;
-
-    const selection = window.getSelection();
-    const node = selection.anchorNode;
-    const insideChecklist = node?.parentElement?.closest('.checklist-item') ||
-                            node?.closest?.('.checklist-item');
-    if (!insideChecklist) return;
-
-
-    let checklistText = null;
-
-    if (node) {
-
-        if (
-            node.parentElement &&
-            node.parentElement.classList.contains('checklist-text')
-        ) {
-            checklistText = node.parentElement;
-
-        } else if (
-            node.classList &&
-            node.classList.contains('checklist-text')
-        ) {
-            checklistText = node;
-        }
-    }
-
-    if (!checklistText) return;
-
-    e.preventDefault();
-
-    const currentItem = checklistText.closest('.checklist-item');
-
-    // Empty item -> remove checklist and continue typing normally
-if (checklistText.textContent.trim() === '') {
-
-    e.preventDefault();
-
-    // Create normal text line
-    const normalLine = document.createElement('div');
-    normalLine.innerHTML = '<br>';
-
-    // Insert after checklist
-    currentItem.insertAdjacentElement('afterend', normalLine);
-
-    // Remove empty checklist
-    currentItem.remove();
-
-    // Move cursor to normal line
-    const range = document.createRange();
-    const selection = window.getSelection();
-
-    range.setStart(normalLine, 0);
-    range.collapse(true);
-
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    noteContent.focus();
-
-    noteContent.dispatchEvent(new Event('input'));
-
-    return;
-}
-    // Create new checklist item
-    const newItem = document.createElement('div');
-    newItem.className = 'checklist-item';
-
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-
-    const text = document.createElement('span');
-    text.className = 'checklist-text';
-    text.contentEditable = 'true';
-
-    newItem.appendChild(checkbox);
-    newItem.appendChild(text);
-
-    // Insert directly below current item
-    currentItem.insertAdjacentElement('afterend', newItem);
-
-    // Focus cursor inside new checklist
-    const range = document.createRange();
-
-    range.selectNodeContents(text);
-    range.collapse(true);
-
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    text.focus();
-
-    noteContent.dispatchEvent(new Event('input'));
-});
 
 // Set font
 function setFont(font) {
@@ -743,15 +489,52 @@ function renderSidebar() {
 // BLOCK-BASED EDITOR
 let draggedBlock = null;
 
-function createBlock(content = '') {
+function createBlock(content = '', type = 'text') {
     const block = document.createElement('div');
     block.className = 'block';
+    block.dataset.type = type;
+    let prefix = '';
+
+    if (type === 'bullet') {
+        prefix = '<span class="block-prefix">•</span>';
+    }
+
+    if (type === 'numbered') {
+        prefix = '<span class="block-prefix number-prefix">1.</span>';
+    }
+
+    if (type === 'todo') {
+        prefix = '<input type="checkbox" class="todo-checkbox">';
+    }
+
     block.innerHTML = `
         <span class="block-handle" title="Drag to move">⠿</span>
+        ${prefix}
         <div class="block-content" contenteditable="true">${content}</div>
     `;
     initBlockEvents(block);
     return block;
+}
+
+function updateNumberedBlocks() {
+    const blocks =
+        noteContent.querySelectorAll('.block');
+
+    let currentNumber = 1;
+
+    blocks.forEach(block => {
+        if (block.dataset.type === 'numbered') {
+            const prefix =
+                block.querySelector('.number-prefix');
+
+            if (prefix) {
+                prefix.textContent =
+                    `${currentNumber}.`;
+            }
+
+            currentNumber++;
+        }
+    });
 }
 
 function moveCursorToStart(element) {
@@ -868,12 +651,74 @@ function initBlockEvents(block) {
     content.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            const newBlock = createBlock('');
-            block.insertAdjacentElement('afterend', newBlock);
-            newBlock.querySelector('.block-content').focus();
+
+            const isEmpty =
+                content.innerText.trim() === '';
+
+            const blockType =
+                block.dataset.type || 'text';
+
+            if ( isEmpty && blockType !== 'text') {
+                const newBlock =
+                    createBlock('', 'text');
+
+                block.replaceWith(newBlock);
+
+                newBlock
+                    .querySelector('.block-content')
+                    .focus();
+
+                updateNumberedBlocks();
+                autoSave();
+
+                return;
+            }
+
+            const newBlock =
+                createBlock('', blockType);
+
+            block.insertAdjacentElement(
+                'afterend',
+                newBlock
+            );
+
+            const newContent =
+                newBlock.querySelector('.block-content');
+
+            newContent.focus();
+
+            updateNumberedBlocks();
             autoSave();
         }
 
+        const blockType =
+            block.dataset.type || 'text';
+
+        if (
+            e.key === 'Backspace' &&
+            content.innerText.trim() === '' &&
+            blockType !== 'text'
+        ) {
+            e.preventDefault();
+
+            const text =
+                content.innerHTML;
+
+            const newBlock =
+                createBlock(text, 'text');
+
+            block.replaceWith(newBlock);
+
+            newBlock
+                .querySelector('.block-content')
+                .focus();
+
+            updateNumberedBlocks();
+            autoSave();
+
+            return;
+        }
+        
         // Backspace at the start of an empty block removes it
         if (e.key === 'Backspace' && content.innerText.trim() === '') {
 
@@ -896,6 +741,7 @@ function initBlockEvents(block) {
 
             const prev = block.previousElementSibling;
             block.remove();
+            updateNumberedBlocks();
 
             if (prev) {
                 const prevContent = prev.querySelector('.block-content');
@@ -963,9 +809,26 @@ function initBlockEvents(block) {
     content.addEventListener('input', () => autoSave());
 }
 
-function openBlockMenu(handle, block) {
-    console.log('OPEN MENU');
+function convertBlockType(type) {
+    if (!activeBlockMenuTarget) return;
 
+    const content =
+        activeBlockMenuTarget.querySelector('.block-content').innerHTML;
+
+    const newBlock =
+        createBlock(content, type);
+
+    activeBlockMenuTarget.replaceWith(newBlock);
+
+    activeBlockMenuTarget = newBlock;
+
+    updateNumberedBlocks();
+    autoSave();
+
+    closeBlockMenu();
+}
+
+function openBlockMenu(handle, block) {
     activeBlockMenuTarget = block;
 
     const rect = handle.getBoundingClientRect();
@@ -979,6 +842,18 @@ function closeBlockMenu() {
     blockMenu.classList.remove('active');
     activeBlockMenuTarget = null;
 }
+
+blockBulletedList.addEventListener('click', () => {
+    convertBlockType('bullet');
+});
+
+blockNumberedList.addEventListener('click', () => {
+    convertBlockType('numbered');
+});
+
+blockChecklist.addEventListener('click', () => {
+    convertBlockType('todo');
+});
 
 // Converts saved HTML (free text) in blocks
 function parseContentToBlocks(html) {
