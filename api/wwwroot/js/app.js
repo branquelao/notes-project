@@ -929,11 +929,9 @@ async function selectNote(id) {
     //Set the default font that is saved
     setFont(note.font || 'default');
 
-    initializeChecklistItems();
-
     // Update sidebar active state
     renderSidebar();
-    
+
     // Update button if active
     updateFavoriteButton();
 
@@ -1075,7 +1073,7 @@ async function saveCurrentNote() {
         });
         
         if (response.ok) {
-            // Update local notes array
+            // Update local notes arrays
             const index = notes.findIndex(n => n.id === currentNoteId);
             if (index !== -1) {
                 notes[index] = { ...notes[index], ...updatedNote };
