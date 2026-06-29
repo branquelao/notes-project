@@ -130,7 +130,6 @@ body {
     margin-bottom: 2px;
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.15s;
     color: var(--text-primary);
     gap: 8px;
 }
