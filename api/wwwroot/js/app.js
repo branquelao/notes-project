@@ -533,6 +533,8 @@ function updateNumberedBlocks() {
             }
 
             currentNumber++;
+        } else {
+            currentNumber = 1;
         }
     });
 }
