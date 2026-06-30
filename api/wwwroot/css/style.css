@@ -421,8 +421,6 @@ input:checked + .toggle-slider:before {
     background: transparent;
     flex: 1;
     padding: 0 96px 60px 250px;
-    overflow-y: auto;
-    min-height: 200px;
 }
 
 .note-content-input:empty:before {
