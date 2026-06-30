@@ -33,10 +33,11 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
   - Text
   - Bulleted List
   - Numbered List
-  - To-do List
+  - To-do List (checked state persisted after reload)
 - Notion-style keyboard behavior:
   - `Enter` creates a new block of the same type
-  - `Enter` on an empty list item exits the list
+  - `Backspace` on an empty list/to-do item converts it back to a text block
+  - `Backspace` on an empty first block moves focus to the title
 - **ContentEditable API**
 - HTML content storage for formatting preservation
 
@@ -50,6 +51,14 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
 - Light and dark themes
 - Inline note actions
 - Responsive interactions
+
+### Keyboard Shortcuts
+- **Ctrl+N** – New note
+- **Ctrl+S** – Save note
+- **Ctrl+B** – Bold
+- **Ctrl+I** – Italic
+- **Ctrl+U** – Underline
+- **Ctrl+D** – Duplicate note
 
 ### API Integration
 RESTful API with JWT authentication.
@@ -119,7 +128,7 @@ In development
 - ✅ Auto-save
 - ✅ Search
 - ✅ Favorites
-- ✅ Dark mod
+- ✅ Dark mode
 - ✅ Note duplication
 - ✅ Export notes
 - ✅ CORS setup
@@ -129,7 +138,8 @@ In development
 - ✅ Bulleted List blocks
 - ✅ Numbered List blocks
 - ✅ To-do List blocks
-- ✅ Notion-style Enter behavior
+- ✅ Persist block types and checklist state
+- ✅ Notion-style Enter/Backspace behavior
 
 ---
 
@@ -137,5 +147,6 @@ In development
 - 🔲 Categories/folders
 - 🔲 Tags system
 - 🔲 Image uploads (server-side)
-- 🔲 Persist block types and checklist state
 - 🔲 Slash commands (/todo, /image, /heading)
+- 🔲 Floating selection toolbar for text formatting (Bold, Italic, Underline, Strikethrough, Link, Color)
+- 🔲 Expanded block menu (Turn into, Copy link to block, Move to, Duplicate, Delete)
