@@ -496,7 +496,7 @@ function createBlock(content = '', type = 'text') {
     let prefix = '';
 
     if (type === 'bullet') {
-        prefix = '<span class="block-prefix">•</span>';
+        prefix = '<span class="block-prefix">●</span>';
     }
 
     if (type === 'numbered') {
