@@ -872,8 +872,17 @@ function parseContentToBlocks(html) {
     const savedBlocks = temp.querySelectorAll('.block-saved');
     if (savedBlocks.length > 0) {
         savedBlocks.forEach(saved => {
-            noteContent.appendChild(createBlock(saved.innerHTML));
+            const type = saved.dataset.type || 'text';
+            const block = createBlock(saved.innerHTML, type);
+
+            if (type === 'todo' && saved.dataset.checked === 'true') {
+                const checkbox = block.querySelector('.todo-checkbox');
+                if (checkbox) checkbox.checked = true;
+            }
+
+            noteContent.appendChild(block);
         });
+        updateNumberedBlocks();
         return;
     }
 
@@ -900,10 +909,15 @@ function parseContentToBlocks(html) {
 
 // Serializes blocks back to HTML to save
 function serializeBlocks() {
-    const blocks = noteContent.querySelectorAll('.block-content');
-    return [...blocks]
-        .map(b => `<div class="block-saved">${b.innerHTML}</div>`)
-        .join('');
+    const blocks = noteContent.querySelectorAll('.block');
+    return [...blocks].map(block => {
+        const type = block.dataset.type || 'text';
+        const content = block.querySelector('.block-content').innerHTML;
+        const checkbox = block.querySelector('.todo-checkbox');
+        const checked = checkbox ? checkbox.checked : false;
+
+        return `<div class="block-saved" data-type="${type}" data-checked="${checked}">${content}</div>`;
+    }).join('');
 }
 
 // Select and display a note
