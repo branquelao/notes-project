@@ -857,6 +857,7 @@ body.dark-mode .note-content-input img.selected {
 
 .block-content {
     flex: 1;
+    max-width: 650px;
     outline: none;
     min-width: 0;
     word-wrap: break-word;
