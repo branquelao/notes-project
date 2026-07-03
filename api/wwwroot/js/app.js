@@ -54,7 +54,7 @@ function enforceAuth() {
 }
 
 // API Base URL
-const API_URL = 'https://localhost:7269/api/Notes';
+const API_URL = '/api/Notes';
 
 // Elements
 const sidebarNotesList = document.getElementById('sidebarNotesList');
@@ -598,6 +598,18 @@ function isCursorAtEnd(element) {
 function initBlockEvents(block) {
     const handle = block.querySelector('.block-handle');
     const content = block.querySelector('.block-content');
+    const checkbox = block.querySelector('.todo-checkbox');
+
+    // Saves when a checklist is marked/unmarked
+    if (checkbox) {
+        checkbox.addEventListener('change', () => {
+            if (saveTimeout) {
+                clearTimeout(saveTimeout);
+                saveTimeout = null;
+            }
+            saveCurrentNote();
+        });
+    }
 
     // Only activates draggable when holding the handle
     handle.addEventListener('mousedown', () => {
@@ -726,7 +738,6 @@ function initBlockEvents(block) {
 
             const isFirstBlock = !block.previousElementSibling;
 
-            // If first block, goes to title
             if (isFirstBlock) {
                 e.preventDefault();
 
@@ -738,7 +749,6 @@ function initBlockEvents(block) {
                 return;
             }
 
-            // If isnt first block, removes normally
             e.preventDefault();
 
             const prev = block.previousElementSibling;
@@ -765,7 +775,6 @@ function initBlockEvents(block) {
             autoSave();
         }
 
-        // UP and LEFT = goes up
         if (
             (e.key === 'ArrowUp' || e.key === 'ArrowLeft') &&
             isCursorAtStart(content)
@@ -787,7 +796,6 @@ function initBlockEvents(block) {
             }
         }
 
-        // DOWN and RIGHT = goes down
         if (
             (e.key === 'ArrowDown' || e.key === 'ArrowRight') &&
             isCursorAtEnd(content)
@@ -926,6 +934,10 @@ function serializeBlocks() {
 async function selectNote(id) {
     // Save current note before switching
     if (currentNoteId !== null && currentNoteId !== id) {
+        if (saveTimeout) {
+            clearTimeout(saveTimeout);
+            saveTimeout = null;
+        }
         await saveCurrentNote();
     }
     
