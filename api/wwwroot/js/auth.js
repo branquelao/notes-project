@@ -1,4 +1,4 @@
-const API_BASE = "https://localhost:7269/api"; // Adjust if needed
+const API_BASE = "/api"; // Adjust if needed
 
 // Form containers
 const loginForm = document.getElementById("loginForm");
@@ -46,6 +46,18 @@ document.getElementById("loginFormElement").addEventListener("submit", async (e)
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;
 
+    if (!email || !password) {
+        loginError.textContent = "Please fill in all fields.";
+        loginError.classList.add("show");
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        loginError.textContent = "Please enter a valid email address.";
+        loginError.classList.add("show");
+        return;
+    }
+
     try {
         const response = await fetch(`${API_BASE}/auth/login`, {
             method: "POST",
@@ -85,6 +97,24 @@ document.getElementById("registerFormElement").addEventListener("submit", async 
     const name = document.getElementById("registerName").value;
     const email = document.getElementById("registerEmail").value;
     const password = document.getElementById("registerPassword").value;
+
+    if (!name || !email || !password) {
+        registerError.textContent = "Please fill in all fields.";
+        registerError.classList.add("show");
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        registerError.textContent = "Please enter a valid email address.";
+        registerError.classList.add("show");
+        return;
+    }
+
+    if (password.length < 6) {
+        registerError.textContent = "Password must be at least 6 characters.";
+        registerError.classList.add("show");
+        return;
+    }
 
     try {
         const response = await fetch(`${API_BASE}/auth/register`, {
