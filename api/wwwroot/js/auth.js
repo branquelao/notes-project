@@ -1,5 +1,11 @@
 const API_BASE = "/api"; // Adjust if needed
 
+// Email validation
+function isValidEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+}
+
 // Form containers
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
