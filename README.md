@@ -1,6 +1,6 @@
 # Notes Project
 
-A **full-stack, authenticated note-taking application** inspired by **Notion**, built with **ASP.NET Core Web API** and **vanilla JavaScript**.
+A **full-stack, authenticated note-taking application** built with **ASP.NET Core Web API** and **vanilla JavaScript**.
 
 > The frontend is served directly by ASP.NET via `wwwroot`. No separate frontend server is required.
 
@@ -34,7 +34,7 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
   - Bulleted List
   - Numbered List
   - To-do List (checked state persisted after reload)
-- Notion-style keyboard behavior:
+- Editor keyboard behavior:
   - `Enter` creates a new block of the same type
   - `Backspace` on an empty list/to-do item converts it back to a text block
   - `Backspace` on an empty first block moves focus to the title
@@ -46,7 +46,7 @@ A **full-stack, authenticated note-taking application** inspired by **Notion**, 
 - Varied Font selection
 
 ### User Interface
-- Notion-inspired layout
+- Clean, minimal layout
 - Split-pane editor
 - Light and dark themes
 - Inline note actions
@@ -123,7 +123,7 @@ In development
 ### Completed
 - ✅ Full CRUD API
 - ✅ SQLite database with Dapper
-- ✅ Notion-style UI
+- ✅ Clean, minimal UI
 - ✅ Rich text editor
 - ✅ Auto-save
 - ✅ Search
@@ -139,7 +139,7 @@ In development
 - ✅ Numbered List blocks
 - ✅ To-do List blocks
 - ✅ Persist block types and checklist state
-- ✅ Notion-style Enter/Backspace behavior
+- ✅ Editor Enter/Backspace behavior
 
 ---
 
