@@ -40,15 +40,14 @@ namespace NotesProjectAPI.Controllers
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
             var sql = @"
-                INSERT INTO Users (Email, PasswordHash, Name, CreatedAt)
-                VALUES (@Email, @PasswordHash, @Name, @CreatedAt)";
+                INSERT INTO Users (Email, PasswordHash, CreatedAt)
+                VALUES (@Email, @PasswordHash, @CreatedAt)";
 
             await connection.ExecuteAsync(sql, new
             {
                 request.Email,
                 PasswordHash = passwordHash,
-                request.Name,
-                CreatedAt = DateTime.UtcNow.ToString("o")
+                CreatedAt = DateTime.UtcNow
             });
 
             return Ok(new { message = "User created successfully" });
@@ -71,7 +70,7 @@ namespace NotesProjectAPI.Controllers
             return Ok(new
             {
                 token,
-                user = new { user.Id, user.Email, user.Name }
+                user = new { user.Id, user.Email }
             });
         }
 
