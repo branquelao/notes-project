@@ -2,7 +2,6 @@
     Id            SERIAL PRIMARY KEY,
     Email         TEXT NOT NULL UNIQUE,
     PasswordHash  TEXT NOT NULL,
-    Name          TEXT NOT NULL,
     CreatedAt     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
